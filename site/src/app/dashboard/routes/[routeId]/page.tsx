@@ -21,6 +21,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { id as instantId } from "@instantdb/react";
+import { ScriptAssistant } from "@/components/script-assistant";
 
 const WEBHOOK_BASE_URL =
   process.env.NEXT_PUBLIC_WEBHOOK_BASE_URL || "https://captain-hook.deno.dev";
@@ -496,6 +497,11 @@ const RouteDetailPage = () => {
           />
         </div>
       </div>
+      <ScriptAssistant
+        routeName={route.name}
+        destinationUrl={route.destinationUrl}
+        currentScript={route.scriptCode ?? ""}
+      />
     </div>
   );
 };
