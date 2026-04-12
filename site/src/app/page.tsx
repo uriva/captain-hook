@@ -1,6 +1,6 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
-import { Anchor, ArrowRight, Shield, Zap, Eye } from "lucide-react";
+import { Anchor, ArrowRight, MessageSquare, ShieldCheck, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const GithubIcon = ({ className }: { className?: string }) => (
@@ -43,16 +43,16 @@ const HeroSection = () => (
   <section className="border-b border-border">
     <div className="mx-auto max-w-5xl px-6 py-20 sm:py-32">
       <p className="font-mono text-sm text-hook mb-6 tracking-wide">
-        open source webhook translator
+        webhook integrations without code
       </p>
       <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
-        Know where your<br />
-        <span className="text-hook">data flows</span>
+        Connect anything<br />
+        <span className="text-hook">to anything</span>
       </h1>
       <p className="text-lg text-muted-foreground max-w-xl mb-10 leading-relaxed">
-        Captain Hook transforms webhooks using safescript, a language designed so
-        you can prove exactly which hosts receive your data and which secrets get
-        accessed. Before anything runs.
+        Tell Captain Hook what you want connected and it builds the integration
+        for you. No code, no config files, no documentation rabbit holes. Just
+        describe it.
       </p>
       <div className="flex gap-3">
         <a href="/dashboard" className={cn(buttonVariants({ size: "lg" }))}>
@@ -71,100 +71,80 @@ const HeroSection = () => (
   </section>
 );
 
-const CodeExample = () => (
+const chatMessages = [
+  {
+    role: "user" as const,
+    text: "When I get a Stripe payment, send a message to our #sales channel on Slack with the customer name and amount.",
+  },
+  {
+    role: "assistant" as const,
+    text: "Done. I've set up the integration. Here's what it does:",
+  },
+  {
+    role: "assistant" as const,
+    text: "Receives Stripe payment webhooks, extracts the customer name and amount, and posts a formatted message to #sales on Slack. It only talks to hooks.slack.com and reads your Slack token. Nothing else.",
+  },
+];
+
+const ChatDemo = () => (
   <section className="border-b border-border">
     <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
-      <div className="grid md:grid-cols-2 gap-8">
-        <div>
-          <p className="font-mono text-xs text-muted-foreground mb-3">
-            01 — the script
-          </p>
-          <div className="code-block p-5">
-            <pre className="whitespace-pre-wrap">
-              <span className="comment">{"// Transform a Stripe webhook for Slack"}</span>
-              {"\n"}
-              <span className="keyword">transform</span>
-              {" = ("}
-              <span className="type">payload</span>
-              {": "}
-              <span className="type">Any</span>
-              {"): "}
-              <span className="type">Any</span>
-              {" => {\n  "}
-              <span className="keyword">return</span>
-              {" "}
-              <span className="op">merge</span>
-              {"({\n    "}
-              <span className="string">{'"text"'}</span>
-              {": "}
-              <span className="op">stringConcat</span>
-              {"(\n      "}
-              <span className="string">{'"Payment received: $"'}</span>
-              {",\n      "}
-              <span className="op">pick</span>
-              {"("}
-              <span className="type">payload</span>
-              {", "}
-              <span className="string">{'"amount"'}</span>
-              {")\n    )\n  })\n}"}
-            </pre>
-          </div>
+      <p className="font-mono text-xs text-muted-foreground mb-3">
+        this is what it looks like
+      </p>
+      <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-10">
+        You describe it. Captain Hook builds it.
+      </h2>
+      <div className="border border-border max-w-2xl">
+        <div className="border-b border-border px-4 py-3 flex items-center gap-2">
+          <MessageSquare className="h-4 w-4 text-hook" />
+          <span className="font-mono text-xs text-muted-foreground">
+            new integration
+          </span>
         </div>
-        <div>
-          <p className="font-mono text-xs text-muted-foreground mb-3">
-            02 — the signature (computed before execution)
-          </p>
-          <div className="code-block p-5">
-            <pre className="whitespace-pre-wrap">
-              {"{\n"}
-              {"  "}
-              <span className="string">{'"hosts"'}</span>
-              {": [],\n"}
-              {"  "}
-              <span className="string">{'"secretsRead"'}</span>
-              {": [],\n"}
-              {"  "}
-              <span className="string">{'"secretsWritten"'}</span>
-              {": [],\n"}
-              {"  "}
-              <span className="string">{'"dataFlow"'}</span>
-              {": {\n"}
-              {"    "}
-              <span className="string">{'"return"'}</span>
-              {": ["}
-              <span className="string">{'"param:payload"'}</span>
-              {"]\n"}
-              {"  }\n}"}
-            </pre>
-          </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            No network calls. No secret access. Output derived only from the
-            input payload. You know this before execution.
-          </p>
+        <div className="p-4 flex flex-col gap-3">
+          {chatMessages.map((msg, i) => (
+            <div
+              key={i}
+              className={cn(
+                "px-4 py-3 text-sm leading-relaxed max-w-[85%]",
+                msg.role === "user"
+                  ? "bg-hook/10 text-foreground self-end"
+                  : "bg-muted text-foreground self-start",
+              )}
+            >
+              {msg.text}
+            </div>
+          ))}
         </div>
       </div>
+      <p className="text-sm text-muted-foreground mt-6 max-w-2xl leading-relaxed">
+        Captain Hook understands what you want, writes the integration, and
+        shows you exactly where your data will go before anything runs. You
+        approve it, and you&apos;re live.
+      </p>
     </div>
   </section>
 );
 
 const features = [
   {
-    icon: Eye,
-    title: "Static data flow analysis",
+    icon: MessageSquare,
+    title: "Just describe it",
     description:
-      "safescript's type system lets you compute exactly which hosts and secrets a script touches. Not at runtime, not in a sandbox. At parse time, before anything executes.",
+      "Tell the AI what you want connected in plain English. Stripe to Slack, GitHub to email, a CRM to a spreadsheet. It writes the integration for you.",
   },
   {
-    icon: Shield,
-    title: "Permission enforcement",
+    icon: ShieldCheck,
+    title: "See where your data goes",
     description:
-      "Set which hosts and secrets each route is allowed to access. Captain Hook verifies the script's computed signature against these permissions before running it.",
+      "Before anything runs, Captain Hook shows you exactly which services will receive your data and which secrets get used. You approve the connections, not the code.",
   },
   {
     icon: Zap,
     title: "100k events/month free",
     description:
-      "10x the most generous competitor. No credit card required. We believe webhook transformation should be cheap. Beyond 100k, talk to us.",
+      "10x the most generous competitor. No credit card required. Beyond 100k, talk to us.",
   },
 ];
 
@@ -172,10 +152,10 @@ const FeaturesSection = () => (
   <section className="border-b border-border">
     <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
       <p className="font-mono text-xs text-muted-foreground mb-3">
-        03 — why this matters
+        why captain hook
       </p>
       <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-12">
-        The gap between &quot;sandboxed&quot; and &quot;provable&quot;
+        Integrations should be this easy
       </h2>
       <div className="grid md:grid-cols-3 gap-8">
         {features.map((feature) => (
@@ -196,24 +176,23 @@ const ComparisonSection = () => (
   <section className="border-b border-border">
     <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
       <p className="font-mono text-xs text-muted-foreground mb-3">
-        04 — versus the alternatives
+        versus the alternatives
       </p>
       <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-8">
-        Every competitor picks the wrong tradeoff
+        Other tools make you do the work
       </h2>
       <p className="text-muted-foreground max-w-2xl mb-12 leading-relaxed">
-        Hookdeck, Convoy, and Pipedream give you arbitrary JavaScript in a
-        sandbox. Secure, maybe. But you can&apos;t look at a script and know
-        where data goes without reading every line. AWS EventBridge goes the
-        other way: pure templates, no code, but so limited you can&apos;t do
-        real logic.
+        Most webhook tools hand you a code editor and say good luck. Hookdeck,
+        Convoy, Pipedream, they all assume you can write JavaScript. AWS
+        EventBridge skips the code but gives you rigid templates that barely
+        handle real use cases. Zapier makes it visual but breaks down the moment
+        you need something slightly custom.
       </p>
       <p className="text-muted-foreground max-w-2xl mb-12 leading-relaxed">
-        Captain Hook sits in the middle. safescript is expressive enough to do
-        real webhook transformations (string manipulation, JSON restructuring,
-        HTTP calls, secret access) but constrained enough that a static
-        analysis pass can tell you every host and every secret a script will
-        touch. Before it runs.
+        Captain Hook takes a different approach. You describe what you want in
+        plain language, the AI builds it, and you get a clear breakdown of
+        exactly where your data flows before you go live. No code to write, no
+        templates to wrestle with, no 50-step automation chains.
       </p>
       <div className="overflow-x-auto">
         <table className="w-full text-sm border border-border">
@@ -223,10 +202,10 @@ const ComparisonSection = () => (
                 Tool
               </th>
               <th className="text-left p-3 font-mono text-xs font-normal text-muted-foreground">
-                Transformation
+                Setup
               </th>
               <th className="text-left p-3 font-mono text-xs font-normal text-muted-foreground">
-                Data flow proof
+                Data visibility
               </th>
               <th className="text-left p-3 font-mono text-xs font-normal text-muted-foreground">
                 Free tier
@@ -235,16 +214,17 @@ const ComparisonSection = () => (
           </thead>
           <tbody>
             {[
-              ["Hookdeck", "Arbitrary JS", "No", "10k events/mo"],
-              ["Convoy", "Arbitrary JS", "No", "Self-host only"],
-              ["EventBridge", "JSON templates", "Implicit (no code)", "Pay per event"],
+              ["Hookdeck", "Write JavaScript", "None", "10k events/mo"],
+              ["Convoy", "Write JavaScript", "None", "Self-host only"],
+              ["Zapier", "Drag-and-drop builder", "None", "100 tasks/mo"],
+              ["EventBridge", "JSON templates", "Limited", "Pay per event"],
               [
                 "Captain Hook",
-                "safescript",
-                "Yes, static analysis",
+                "Describe in plain English",
+                "Full data flow proof",
                 "100k events/mo",
               ],
-            ].map(([tool, transform, proof, free]) => (
+            ].map(([tool, setup, visibility, free]) => (
               <tr
                 key={tool}
                 className={`border-b border-border ${
@@ -258,14 +238,14 @@ const ComparisonSection = () => (
                     tool
                   )}
                 </td>
-                <td className="p-3">{transform}</td>
                 <td className="p-3">
-                  {proof === "Yes, static analysis" ? (
-                    <span className="text-hook font-bold">{proof}</span>
+                  {tool === "Captain Hook" ? (
+                    <span className="text-hook font-bold">{setup}</span>
                   ) : (
-                    proof
+                    setup
                   )}
                 </td>
+                <td className="p-3">{visibility}</td>
                 <td className="p-3">{free}</td>
               </tr>
             ))}
@@ -280,30 +260,30 @@ const HowItWorksSection = () => (
   <section className="border-b border-border">
     <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
       <p className="font-mono text-xs text-muted-foreground mb-3">
-        05 — how it works
+        how it works
       </p>
       <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-12">
-        Three steps, zero surprises
+        Three steps, no coding
       </h2>
       <div className="grid md:grid-cols-3 gap-8">
         {[
           {
             step: "01",
-            title: "Create a route",
+            title: "Describe the connection",
             description:
-              "Point an incoming webhook URL to a destination. Write a safescript function (or let our AI write one for you) that transforms the payload.",
+              "Tell Captain Hook what you want. \"When Stripe sends a payment, post it to Slack.\" That's it. The AI figures out the rest.",
           },
           {
             step: "02",
-            title: "Review the signature",
+            title: "Review and approve",
             description:
-              "Captain Hook computes the script's data flow signature. You see exactly which hosts, secrets, and data paths it touches. Set permissions accordingly.",
+              "Captain Hook shows you exactly which services will receive your data and which credentials get used. Nothing runs until you say so.",
           },
           {
             step: "03",
             title: "Go live",
             description:
-              "Every incoming webhook gets transformed and forwarded. Permissions are enforced on every execution. Stats tracked in real time.",
+              "Flip the switch. Every incoming event gets transformed and forwarded automatically. You can see stats and update the integration anytime by chatting with it.",
           },
         ].map((item) => (
           <div key={item.step}>
@@ -325,7 +305,7 @@ const PricingSection = () => (
   <section className="border-b border-border">
     <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
       <p className="font-mono text-xs text-muted-foreground mb-3">
-        06 — pricing
+        pricing
       </p>
       <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-12">
         Generous by default
@@ -336,8 +316,8 @@ const PricingSection = () => (
           <p className="text-4xl font-bold mb-1">$0</p>
           <p className="text-sm text-muted-foreground mb-6">forever</p>
           <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-            100,000 events per month. Unlimited routes. Full static analysis.
-            All features included.
+            100,000 events per month. Unlimited integrations. Full data flow
+            visibility. All features included.
           </p>
           <a href="/dashboard" className={cn(buttonVariants(), "w-full")}>
             Get started
@@ -381,14 +361,6 @@ const Footer = () => (
           GitHub
         </a>
         <a
-          href="https://safescript.uriva.deno.net"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:text-foreground transition-colors"
-        >
-          safescript
-        </a>
-        <a
           href="mailto:uri.valevski@gmail.com"
           className="hover:text-foreground transition-colors"
         >
@@ -403,7 +375,7 @@ const Page = () => (
   <div className="min-h-screen">
     <Header />
     <HeroSection />
-    <CodeExample />
+    <ChatDemo />
     <FeaturesSection />
     <ComparisonSection />
     <HowItWorksSection />
