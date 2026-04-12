@@ -1,9 +1,4 @@
-import {
-  computeSignature,
-  interpret,
-  parse,
-  tokenize,
-} from "@uri/safescript";
+import { computeSignature, interpret, parse, tokenize } from "@uri/safescript";
 import type { ExecutionContext, Signature } from "@uri/safescript";
 import { db } from "./db.ts";
 
@@ -81,14 +76,12 @@ const verifyPermissions = (
 const buildContext = (secrets: readonly Secret[]): ExecutionContext => {
   const secretMap = new Map(secrets.map((s) => [s.name, s.value]));
   return {
-    readSecret: async (name: string) => {
-      const val = secretMap.get(name);
-      if (val === undefined) throw new Error(`Secret "${name}" not found`);
-      return val;
-    },
-    writeSecret: async (_name: string, _value: string) => {
-      // No-op in webhook context for now
-    },
+    readSecret: (_name: string) =>
+      Promise.resolve(secretMap.get(_name)).then((val) => {
+        if (val === undefined) throw new Error(`Secret "${_name}" not found`);
+        return val;
+      }),
+    writeSecret: (_name: string, _value: string) => Promise.resolve(),
     fetch: globalThis.fetch,
   };
 };
