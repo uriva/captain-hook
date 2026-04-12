@@ -60,8 +60,8 @@ const CreateRouteForm = ({
       db.tx.routes[routeId]
         .update({
           name: name.trim(),
-          scriptCode: `transform = (payload: Any): Any => {\n  return payload\n}`,
-          scriptFunctionName: "transform",
+          scriptCode: "",
+          scriptFunctionName: "",
           allowedHosts: [],
           allowedSecrets: [],
           active: true,

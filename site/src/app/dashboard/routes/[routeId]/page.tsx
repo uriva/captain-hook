@@ -21,8 +21,19 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { id as instantId } from "@instantdb/react";
-import { InlineChat } from "@/components/inline-chat";
+import dynamic from "next/dynamic";
 import { SafescriptDiagram } from "@/components/safescript-diagram";
+
+const InlineChat = dynamic(() =>
+  import("@/components/inline-chat").then((mod) => ({ default: mod.InlineChat })), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-full gap-2 text-sm text-muted-foreground">
+      <Loader2 className="h-4 w-4 animate-spin" />
+      Loading chat...
+    </div>
+  ),
+});
 
 const WEBHOOK_BASE_URL =
   process.env.NEXT_PUBLIC_WEBHOOK_BASE_URL ||
