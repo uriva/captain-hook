@@ -53,7 +53,7 @@ const InlineChat = ({
   routeName: string;
   currentScript: string;
 }) => {
-  const credentials = useCredentials(null, "captain-hook-chat");
+  const credentials = useCredentials("User", "captain-hook-chat");
   const initialMessageRef = useRef<string | null>(null);
 
   if (initialMessageRef.current === null) {
