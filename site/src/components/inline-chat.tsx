@@ -1,0 +1,102 @@
+"use client";
+
+import { useRef } from "react";
+import {
+  useCredentials,
+  useGetOrCreateConversation,
+} from "@alice-and-bot/core";
+import type { Credentials } from "@alice-and-bot/core";
+import { Chat } from "@alice-and-bot/core/components";
+import { Loader2 } from "lucide-react";
+
+const BOT_PUBLIC_KEY = process.env.NEXT_PUBLIC_BOT_PUBLIC_KEY ?? "";
+
+const ConnectedChat = ({
+  credentials,
+  initialMessage,
+}: {
+  credentials: Credentials;
+  initialMessage: string;
+}) => {
+  const conversationId = useGetOrCreateConversation({
+    credentials,
+    participants: [BOT_PUBLIC_KEY],
+    initialMessage,
+  });
+
+  if (!conversationId) {
+    return (
+      <div className="flex items-center justify-center h-full gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Connecting...
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full w-full">
+      <Chat
+        credentials={credentials}
+        conversationId={conversationId}
+        enableAttachments={false}
+        enableAudioRecording={false}
+        emptyMessage="Ask me to write or improve your safescript transformation."
+      />
+    </div>
+  );
+};
+
+const InlineChat = ({
+  routeName,
+  destinationUrl,
+  currentScript,
+}: {
+  routeName: string;
+  destinationUrl: string;
+  currentScript: string;
+}) => {
+  const credentials = useCredentials(null, "captain-hook-chat");
+  const initialMessageRef = useRef<string | null>(null);
+
+  if (initialMessageRef.current === null) {
+    const parts = [
+      `I'm editing a webhook route called "${routeName}".`,
+      `It forwards to: ${destinationUrl}`,
+    ];
+    if (currentScript.trim()) {
+      parts.push(`Current script:\n\`\`\`\n${currentScript}\n\`\`\``);
+      parts.push("Help me improve or debug this script.");
+    } else {
+      parts.push(
+        "There's no script yet. Help me write a transformation script.",
+      );
+    }
+    initialMessageRef.current = parts.join("\n");
+  }
+
+  if (!BOT_PUBLIC_KEY) {
+    return (
+      <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
+        Bot public key not configured.
+      </div>
+    );
+  }
+
+  if (!credentials) {
+    return (
+      <div className="flex items-center justify-center h-full gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Loading...
+      </div>
+    );
+  }
+
+  return (
+    <ConnectedChat
+      credentials={credentials}
+      initialMessage={initialMessageRef.current ?? ""}
+    />
+  );
+};
+
+export { InlineChat };

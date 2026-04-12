@@ -21,10 +21,12 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { id as instantId } from "@instantdb/react";
-import { ScriptAssistant } from "@/components/script-assistant";
+import { InlineChat } from "@/components/inline-chat";
+import { SafescriptDiagram } from "@/components/safescript-diagram";
 
 const WEBHOOK_BASE_URL =
-  process.env.NEXT_PUBLIC_WEBHOOK_BASE_URL || "https://captain-hook.deno.dev";
+  process.env.NEXT_PUBLIC_WEBHOOK_BASE_URL ||
+  "https://captain-hook-server.uriva.deno.net";
 
 const CopyButton = ({ text }: { text: string }) => {
   const [copied, setCopied] = useState(false);
@@ -347,10 +349,34 @@ const EventLog = ({
   </div>
 );
 
+type RightTab = "diagram" | "settings" | "events";
+
+const TabButton = ({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) => (
+  <button
+    onClick={onClick}
+    className={`px-3 py-1.5 text-xs font-bold transition-colors ${
+      active
+        ? "text-foreground border-b-2 border-hook"
+        : "text-muted-foreground hover:text-foreground"
+    }`}
+  >
+    {children}
+  </button>
+);
+
 const RouteDetailPage = () => {
   const params = useParams<{ routeId: string }>();
   const { user } = useAuth();
   const routeId = params.routeId;
+  const [rightTab, setRightTab] = useState<RightTab>("diagram");
 
   const { isLoading, error, data } = db.useQuery(
     user
@@ -402,24 +428,28 @@ const RouteDetailPage = () => {
 
   const deleteRoute = async () => {
     await db.transact(db.tx.routes[route.id].delete());
-    window.location.href = "/dashboard";
+    globalThis.location.href = "/dashboard";
   };
 
   const parsedHosts: string[] = (route.allowedHosts as string[]) ?? [];
-
   const parsedSecrets: string[] = (route.allowedSecrets as string[]) ?? [];
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
+        <div className="flex items-center gap-4">
           <a
             href="/dashboard"
-            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="h-3 w-3" /> Routes
+            <ArrowLeft className="h-4 w-4" />
           </a>
-          <h1 className="text-2xl font-bold tracking-tight">{route.name}</h1>
+          <h1 className="text-lg font-bold tracking-tight">{route.name}</h1>
+          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+            <code className="text-hook">{webhookUrl}</code>
+            <CopyButton text={webhookUrl} />
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -438,70 +468,115 @@ const RouteDetailPage = () => {
             className="text-destructive hover:text-destructive gap-1"
           >
             <Trash2 className="h-3.5 w-3.5" />
-            Delete
           </Button>
         </div>
       </div>
 
-      <div className="border border-border p-4 space-y-2">
-        <p className="text-xs text-muted-foreground font-mono">Webhook URL</p>
-        <div className="flex items-center gap-2">
-          <code className="text-sm font-mono text-hook">{webhookUrl}</code>
-          <CopyButton text={webhookUrl} />
+      {/* Split screen */}
+      <div className="flex flex-1 min-h-0">
+        {/* Left panel: Chat */}
+        <div className="w-1/2 border-r border-border flex flex-col min-h-0">
+          <div className="px-4 py-2 border-b border-border shrink-0">
+            <span className="text-xs font-bold text-muted-foreground">
+              ASSISTANT
+            </span>
+          </div>
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <InlineChat
+              routeName={route.name}
+              destinationUrl={route.destinationUrl}
+              currentScript={route.scriptCode ?? ""}
+            />
+          </div>
         </div>
-        <p className="text-xs text-muted-foreground font-mono mt-2">
-          Destination
-        </p>
-        <code className="text-sm font-mono">{route.destinationUrl}</code>
-      </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        <div className="space-y-8">
-          <ScriptEditor
-            code={route.scriptCode}
-            functionName={route.scriptFunctionName}
-            onSave={(code, fn) =>
-              updateRoute({ scriptCode: code, scriptFunctionName: fn })
-            }
-          />
-          <SecretsManager
-            routeId={route.id}
-            secrets={(route.secrets ?? []) as Array<{
-              id: string;
-              name: string;
-              value: string;
-            }>}
-          />
-        </div>
-        <div className="space-y-8">
-          <PermissionsEditor
-            allowedHosts={parsedHosts}
-            allowedSecrets={parsedSecrets}
-            onSaveHosts={(hosts) =>
-              updateRoute({ allowedHosts: hosts })
-            }
-            onSaveSecrets={(secrets) =>
-              updateRoute({ allowedSecrets: secrets })
-            }
-          />
-          <EventLog
-            events={
-              (route.events ?? []) as Array<{
-                id: string;
-                status: string;
-                latencyMs: number;
-                errorMessage?: string;
-                timestamp: number;
-              }>
-            }
-          />
+        {/* Right panel: Tabbed view */}
+        <div className="w-1/2 flex flex-col min-h-0">
+          <div className="flex items-center gap-1 px-4 border-b border-border shrink-0">
+            <TabButton
+              active={rightTab === "diagram"}
+              onClick={() => setRightTab("diagram")}
+            >
+              Diagram
+            </TabButton>
+            <TabButton
+              active={rightTab === "settings"}
+              onClick={() => setRightTab("settings")}
+            >
+              Settings
+            </TabButton>
+            <TabButton
+              active={rightTab === "events"}
+              onClick={() => setRightTab("events")}
+            >
+              Events
+            </TabButton>
+          </div>
+          <div className="flex-1 min-h-0 overflow-auto">
+            {rightTab === "diagram" && (
+              <SafescriptDiagram
+                code={route.scriptCode ?? ""}
+                functionName={route.scriptFunctionName ?? ""}
+              />
+            )}
+            {rightTab === "settings" && (
+              <div className="p-4 space-y-8">
+                <div className="space-y-2">
+                  <h3 className="font-bold text-sm">Destination</h3>
+                  <code className="text-sm font-mono block">
+                    {route.destinationUrl}
+                  </code>
+                </div>
+                <ScriptEditor
+                  code={route.scriptCode}
+                  functionName={route.scriptFunctionName}
+                  onSave={(code, fn) =>
+                    updateRoute({
+                      scriptCode: code,
+                      scriptFunctionName: fn,
+                    })
+                  }
+                />
+                <PermissionsEditor
+                  allowedHosts={parsedHosts}
+                  allowedSecrets={parsedSecrets}
+                  onSaveHosts={(hosts) =>
+                    updateRoute({ allowedHosts: hosts })
+                  }
+                  onSaveSecrets={(secrets) =>
+                    updateRoute({ allowedSecrets: secrets })
+                  }
+                />
+                <SecretsManager
+                  routeId={route.id}
+                  secrets={
+                    (route.secrets ?? []) as Array<{
+                      id: string;
+                      name: string;
+                      value: string;
+                    }>
+                  }
+                />
+              </div>
+            )}
+            {rightTab === "events" && (
+              <div className="p-4">
+                <EventLog
+                  events={
+                    (route.events ?? []) as Array<{
+                      id: string;
+                      status: string;
+                      latencyMs: number;
+                      errorMessage?: string;
+                      timestamp: number;
+                    }>
+                  }
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      <ScriptAssistant
-        routeName={route.name}
-        destinationUrl={route.destinationUrl}
-        currentScript={route.scriptCode ?? ""}
-      />
     </div>
   );
 };

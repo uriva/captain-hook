@@ -192,7 +192,7 @@ const DashboardPage = () => {
   const routes = data?.routes ?? [];
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-5xl w-full px-6 py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Routes</h1>

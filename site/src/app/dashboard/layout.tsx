@@ -40,7 +40,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => (
   <AuthGate>
     <div className="min-h-screen flex flex-col">
       <DashboardNav />
-      <main className="flex-1 mx-auto max-w-5xl w-full px-6 py-8">
+      <main className="flex-1">
         {children}
       </main>
     </div>
