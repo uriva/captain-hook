@@ -1,0 +1,26 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-all --watch src/main.ts",
+    "start": "deno run --allow-all src/main.ts",
+    "test": "deno test --allow-all"
+  },
+  "imports": {
+    "@uri/safescript": "jsr:@uri/safescript@^0.1.0",
+    "gamla": "jsr:@uri/gamla@0.0.14",
+    "@instantdb/admin": "npm:@instantdb/admin@0.17.12"
+  },
+  "compilerOptions": {
+    "strict": true
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "singleQuote": false
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-explicit-any"]
+    }
+  }
+}

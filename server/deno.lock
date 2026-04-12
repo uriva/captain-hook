@@ -1,0 +1,64 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@noble/hashes@2.0.0": "2.0.0",
+    "jsr:@std/encoding@0.224.0": "0.224.0",
+    "jsr:@uri/gamla@0.0.14": "0.0.14",
+    "jsr:@uri/safescript@0.1": "0.1.0",
+    "npm:@instantdb/admin@0.17.12": "0.17.12",
+    "npm:zod@^3.25.42": "3.25.76"
+  },
+  "jsr": {
+    "@noble/hashes@2.0.0": {
+      "integrity": "203b1a1d3a3de1e964e482fbe8196963e12d5dc63f280b42eae2fb74131001c8"
+    },
+    "@std/encoding@0.224.0": {
+      "integrity": "efb6dca97d3e9c31392bd5c8cfd9f9fc9decf5a1f4d1f78af7900a493bcf89b5"
+    },
+    "@uri/gamla@0.0.14": {
+      "integrity": "5a83c61f77d0efc761f6a269596cb8d43658e4343d261f8c28ebbd4522e33519",
+      "dependencies": [
+        "jsr:@noble/hashes",
+        "jsr:@std/encoding"
+      ]
+    },
+    "@uri/safescript@0.1.0": {
+      "integrity": "cf3f2e74e6be0f01d9597e34c2f5dbe429660503412e55278e479cf3392835c8",
+      "dependencies": [
+        "npm:zod"
+      ]
+    }
+  },
+  "npm": {
+    "@instantdb/admin@0.17.12": {
+      "integrity": "sha512-BAxfTJo+uP4Gp+qA4jNs8RcQ1s4ya/g6HJHonSsEExoMjgb4M7QnXblfbkXpZ9QSscuiFKVlmhtgwv3MCadK/Q==",
+      "dependencies": [
+        "@instantdb/core"
+      ]
+    },
+    "@instantdb/core@0.17.12": {
+      "integrity": "sha512-YBcuTn+OoFIcnFam3HwsKffk1kvpLRSbdGMasrersRDpaG4dDr8N0a6jeVYRUhjSL734zm/hVkv/yG0pevVT3A==",
+      "dependencies": [
+        "mutative",
+        "uuid"
+      ]
+    },
+    "mutative@1.3.0": {
+      "integrity": "sha512-8MJj6URmOZAV70dpFe1YnSppRTKC4DsMkXQiBDFayLcDI4ljGokHxmpqaBQuDWa4iAxWaJJ1PS8vAmbntjjKmQ=="
+    },
+    "uuid@9.0.1": {
+      "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
+      "bin": true
+    },
+    "zod@3.25.76": {
+      "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@uri/gamla@0.0.14",
+      "jsr:@uri/safescript@0.1",
+      "npm:@instantdb/admin@0.17.12"
+    ]
+  }
+}
