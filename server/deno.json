@@ -22,5 +22,9 @@
     "rules": {
       "exclude": ["no-explicit-any"]
     }
+  },
+  "deploy": {
+    "org": "uriva",
+    "app": "captain-hook-server"
   }
 }
