@@ -145,6 +145,20 @@ const features = [
     title: "100k events/month free",
     description:
       "10x the most generous competitor. No credit card required. Beyond 100k, talk to us.",
+    extra: (
+      <p className="text-sm text-muted-foreground leading-relaxed mt-2">
+        How? We don&apos;t spin up a VM per request. Integrations run on{" "}
+        <a
+          href="https://safescript.uriva.deno.net"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-hook underline underline-offset-2 hover:text-foreground transition-colors"
+        >
+          safescript
+        </a>
+        , a lightweight language that&apos;s safe by design.
+      </p>
+    ),
   },
 ];
 
@@ -165,6 +179,7 @@ const FeaturesSection = () => (
             <p className="text-sm text-muted-foreground leading-relaxed">
               {feature.description}
             </p>
+            {"extra" in feature && feature.extra}
           </div>
         ))}
       </div>
@@ -185,8 +200,9 @@ const ComparisonSection = () => (
         Most webhook tools hand you a code editor and say good luck. Hookdeck,
         Convoy, Pipedream, they all assume you can write JavaScript. AWS
         EventBridge skips the code but gives you rigid templates that barely
-        handle real use cases. Zapier makes it visual but breaks down the moment
-        you need something slightly custom.
+        handle real use cases. Zapier, Make, and n8n give you visual builders
+        but you end up with 50-step chains that break the moment something
+        changes.
       </p>
       <p className="text-muted-foreground max-w-2xl mb-12 leading-relaxed">
         Captain Hook takes a different approach. You describe what you want in
@@ -208,23 +224,29 @@ const ComparisonSection = () => (
                 Data visibility
               </th>
               <th className="text-left p-3 font-mono text-xs font-normal text-muted-foreground">
+                Open source
+              </th>
+              <th className="text-left p-3 font-mono text-xs font-normal text-muted-foreground">
                 Free tier
               </th>
             </tr>
           </thead>
           <tbody>
             {[
-              ["Hookdeck", "Write JavaScript", "None", "10k events/mo"],
-              ["Convoy", "Write JavaScript", "None", "Self-host only"],
-              ["Zapier", "Drag-and-drop builder", "None", "100 tasks/mo"],
-              ["EventBridge", "JSON templates", "Limited", "Pay per event"],
+              ["Hookdeck", "Write JavaScript", "None", "No", "10k events/mo"],
+              ["Convoy", "Write JavaScript", "None", "Yes", "Self-host only"],
+              ["Zapier", "Drag-and-drop builder", "None", "No", "100 tasks/mo"],
+              ["Make", "Drag-and-drop builder", "None", "No", "1k ops/mo"],
+              ["n8n", "Drag-and-drop builder", "None", "Yes", "Self-host only"],
+              ["EventBridge", "JSON templates", "Limited", "No", "Pay per event"],
               [
                 "Captain Hook",
                 "Describe in plain English",
                 "Full data flow proof",
+                "Yes",
                 "100k events/mo",
               ],
-            ].map(([tool, setup, visibility, free]) => (
+            ].map(([tool, setup, visibility, oss, free]) => (
               <tr
                 key={tool}
                 className={`border-b border-border ${
@@ -246,6 +268,13 @@ const ComparisonSection = () => (
                   )}
                 </td>
                 <td className="p-3">{visibility}</td>
+                <td className="p-3">
+                  {tool === "Captain Hook" ? (
+                    <span className="text-hook font-bold">{oss}</span>
+                  ) : (
+                    oss
+                  )}
+                </td>
                 <td className="p-3">{free}</td>
               </tr>
             ))}
@@ -359,6 +388,14 @@ const Footer = () => (
           className="hover:text-foreground transition-colors"
         >
           GitHub
+        </a>
+        <a
+          href="https://safescript.uriva.deno.net"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-foreground transition-colors"
+        >
+          safescript
         </a>
         <a
           href="mailto:uri.valevski@gmail.com"
