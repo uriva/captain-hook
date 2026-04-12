@@ -7,16 +7,26 @@ import {
 } from "@alice-and-bot/core";
 import type { Credentials } from "@alice-and-bot/core";
 import { Chat } from "@alice-and-bot/core/components";
+import { useTheme } from "next-themes";
 import { Loader2 } from "lucide-react";
 
 const BOT_PUBLIC_KEY = process.env.NEXT_PUBLIC_BOT_PUBLIC_KEY ?? "";
 
+const customColors = {
+  hideTitle: true,
+  background: "transparent",
+  text: "inherit",
+  inputBackground: "transparent",
+};
+
 const ConnectedChat = ({
   credentials,
   initialMessage,
+  isDark,
 }: {
   credentials: Credentials;
   initialMessage: string;
+  isDark: boolean;
 }) => {
   const conversationId = useGetOrCreateConversation({
     credentials,
@@ -34,12 +44,14 @@ const ConnectedChat = ({
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="flex flex-col h-full w-full">
       <Chat
         credentials={credentials}
         conversationId={conversationId}
         enableAttachments={false}
         enableAudioRecording={false}
+        isDark={isDark}
+        customColors={customColors}
         emptyMessage="Ask me to write or improve your safescript transformation."
       />
     </div>
@@ -54,6 +66,7 @@ const InlineChat = ({
   currentScript: string;
 }) => {
   const credentials = useCredentials("User", "captain-hook-chat");
+  const { resolvedTheme } = useTheme();
   const initialMessageRef = useRef<string | null>(null);
 
   if (initialMessageRef.current === null) {
@@ -92,6 +105,7 @@ const InlineChat = ({
     <ConnectedChat
       credentials={credentials}
       initialMessage={initialMessageRef.current ?? ""}
+      isDark={resolvedTheme === "dark"}
     />
   );
 };

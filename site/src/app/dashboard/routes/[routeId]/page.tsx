@@ -492,7 +492,7 @@ const RouteDetailPage = () => {
               ASSISTANT
             </span>
           </div>
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col">
             <InlineChat
               routeName={route.name}
               currentScript={route.scriptCode ?? ""}
