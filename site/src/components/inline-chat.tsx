@@ -48,11 +48,9 @@ const ConnectedChat = ({
 
 const InlineChat = ({
   routeName,
-  destinationUrl,
   currentScript,
 }: {
   routeName: string;
-  destinationUrl: string;
   currentScript: string;
 }) => {
   const credentials = useCredentials(null, "captain-hook-chat");
@@ -60,15 +58,14 @@ const InlineChat = ({
 
   if (initialMessageRef.current === null) {
     const parts = [
-      `I'm editing a webhook route called "${routeName}".`,
-      `It forwards to: ${destinationUrl}`,
+      `I'm editing a webhook automation called "${routeName}".`,
     ];
     if (currentScript.trim()) {
       parts.push(`Current script:\n\`\`\`\n${currentScript}\n\`\`\``);
       parts.push("Help me improve or debug this script.");
     } else {
       parts.push(
-        "There's no script yet. Help me write a transformation script.",
+        "There's no script yet. Help me write one.",
       );
     }
     initialMessageRef.current = parts.join("\n");

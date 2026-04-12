@@ -7,7 +7,7 @@ const _schema = i.schema({
     }),
     routes: i.entity({
       name: i.string(),
-      destinationUrl: i.string(),
+      destinationUrl: i.string().optional(),
       scriptCode: i.string(),
       scriptFunctionName: i.string(),
       allowedHosts: i.json<string[]>(),

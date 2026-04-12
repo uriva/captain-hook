@@ -10,7 +10,6 @@ import {
   ChevronRight,
   Activity,
   Loader2,
-  ExternalLink,
   Copy,
   Check,
 } from "lucide-react";
@@ -51,18 +50,16 @@ const CreateRouteForm = ({
   userId: string;
 }) => {
   const [name, setName] = useState("");
-  const [destinationUrl, setDestinationUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleCreate = async () => {
-    if (!name.trim() || !destinationUrl.trim()) return;
+    if (!name.trim()) return;
     setLoading(true);
     const routeId = id();
     await db.transact(
       db.tx.routes[routeId]
         .update({
           name: name.trim(),
-          destinationUrl: destinationUrl.trim(),
           scriptCode: `transform = (payload: Any): Any => {\n  return payload\n}`,
           scriptFunctionName: "transform",
           allowedHosts: [],
@@ -77,28 +74,24 @@ const CreateRouteForm = ({
 
   return (
     <div className="border border-border p-6 space-y-4">
-      <h3 className="font-bold text-sm">New route</h3>
+      <h3 className="font-bold text-sm">New automation</h3>
       <div className="space-y-3">
         <Input
-          placeholder="Route name (e.g. Stripe to Slack)"
+          placeholder="Name (e.g. Stripe to Slack)"
           value={name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setName(e.target.value)
           }
           autoFocus
-        />
-        <Input
-          placeholder="Destination URL (e.g. https://hooks.slack.com/...)"
-          value={destinationUrl}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setDestinationUrl(e.target.value)
+          onKeyDown={(e: React.KeyboardEvent) =>
+            e.key === "Enter" && handleCreate()
           }
         />
       </div>
       <div className="flex gap-2">
         <Button
           onClick={handleCreate}
-          disabled={!name.trim() || !destinationUrl.trim() || loading}
+          disabled={!name.trim() || loading}
           className="gap-2"
         >
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -118,7 +111,6 @@ const RouteRow = ({
   route: {
     id: string;
     name: string;
-    destinationUrl: string;
     active: boolean;
     events?: Array<{ id: string }>;
   };
@@ -158,15 +150,6 @@ const RouteRow = ({
             <Activity className="h-3.5 w-3.5" />
             <span>{eventCount} events</span>
           </div>
-          <a
-            href={route.destinationUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <ExternalLink className="h-3.5 w-3.5" />
-          </a>
           <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-hook transition-colors" />
         </div>
       </div>
@@ -197,7 +180,7 @@ const DashboardPage = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Routes</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Incoming webhook endpoints with safescript transformations
+            Webhook automations
           </p>
         </div>
         <Button onClick={() => setShowCreate(true)} className="gap-2">
@@ -243,7 +226,6 @@ const DashboardPage = () => {
             (route: {
               id: string;
               name: string;
-              destinationUrl: string;
               active: boolean;
               createdAt: number;
               events?: Array<{ id: string }>;

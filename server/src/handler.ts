@@ -4,7 +4,7 @@ import { db } from "./db.ts";
 
 type Route = {
   readonly id: string;
-  readonly destinationUrl: string;
+  readonly destinationUrl?: string;
   readonly active: boolean;
   readonly scriptCode: string;
   readonly scriptFunctionName: string;
@@ -152,18 +152,12 @@ export const handleWebhook = async (
     }
 
     const ctx = buildContext(secrets);
-    const transformed = await interpret(
+    const result = await interpret(
       program,
       route.scriptFunctionName,
       { payload: body, headers },
       ctx,
     );
-
-    const forwardResponse = await fetch(route.destinationUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(transformed),
-    });
 
     const latency = performance.now() - start;
     await logEvent(route.id, "", "success", latency);
@@ -171,7 +165,7 @@ export const handleWebhook = async (
     return new Response(
       JSON.stringify({
         ok: true,
-        forwarded: forwardResponse.status,
+        result,
         latencyMs: Math.round(latency),
       }),
       { status: 200, headers: { "Content-Type": "application/json" } },

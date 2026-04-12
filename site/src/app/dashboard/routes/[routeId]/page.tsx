@@ -484,7 +484,6 @@ const RouteDetailPage = () => {
           <div className="flex-1 min-h-0 overflow-hidden">
             <InlineChat
               routeName={route.name}
-              destinationUrl={route.destinationUrl}
               currentScript={route.scriptCode ?? ""}
             />
           </div>
@@ -521,12 +520,6 @@ const RouteDetailPage = () => {
             )}
             {rightTab === "settings" && (
               <div className="p-4 space-y-8">
-                <div className="space-y-2">
-                  <h3 className="font-bold text-sm">Destination</h3>
-                  <code className="text-sm font-mono block">
-                    {route.destinationUrl}
-                  </code>
-                </div>
                 <ScriptEditor
                   code={route.scriptCode}
                   functionName={route.scriptFunctionName}
