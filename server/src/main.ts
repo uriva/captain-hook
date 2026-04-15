@@ -1,4 +1,5 @@
 import { handleWebhook } from "./handler.ts";
+import { handleCronTick } from "./cron.ts";
 import { computeSignature, parse, tokenize } from "@uri/safescript";
 
 const corsHeaders = {
@@ -135,5 +136,7 @@ const handleRequest = async (request: Request): Promise<Response> => {
 };
 
 const port = parseInt(Deno.env.get("PORT") ?? "8000");
+
+Deno.cron("hourly-tick", "0 * * * *", handleCronTick);
 
 Deno.serve({ port }, handleRequest);

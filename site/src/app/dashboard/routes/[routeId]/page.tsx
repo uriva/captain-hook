@@ -19,25 +19,51 @@ import {
   X,
   Clock,
   AlertCircle,
+  Webhook,
 } from "lucide-react";
 import { id as instantId } from "@instantdb/react";
 import dynamic from "next/dynamic";
 import { SafescriptDiagram } from "@/components/safescript-diagram";
 
-const InlineChat = dynamic(() =>
-  import("@/components/inline-chat").then((mod) => ({ default: mod.InlineChat })), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-full gap-2 text-sm text-muted-foreground">
-      <Loader2 className="h-4 w-4 animate-spin" />
-      Loading chat...
-    </div>
-  ),
-});
+const InlineChat = dynamic(
+  () =>
+    import("@/components/inline-chat").then((mod) => ({
+      default: mod.InlineChat,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Loading chat...
+      </div>
+    ),
+  },
+);
 
 const WEBHOOK_BASE_URL =
   process.env.NEXT_PUBLIC_WEBHOOK_BASE_URL ||
   "https://captain-hook-server.uriva.deno.net";
+
+const CRON_PRESETS: ReadonlyArray<{
+  readonly label: string;
+  readonly value: string;
+}> = [
+  { label: "Every hour", value: "0 * * * *" },
+  { label: "Every 2 hours", value: "0 */2 * * *" },
+  { label: "Every 4 hours", value: "0 */4 * * *" },
+  { label: "Every 6 hours", value: "0 */6 * * *" },
+  { label: "Every 12 hours", value: "0 */12 * * *" },
+  { label: "Daily at midnight UTC", value: "0 0 * * *" },
+  { label: "Daily at 9am UTC", value: "0 9 * * *" },
+  { label: "Weekdays at 9am UTC", value: "0 9 * * 1-5" },
+];
+
+const cronToHuman = (expr: string): string => {
+  const preset = CRON_PRESETS.find((p) => p.value === expr);
+  if (preset) return preset.label;
+  return expr;
+};
 
 const CopyButton = ({ text }: { text: string }) => {
   const [copied, setCopied] = useState(false);
@@ -60,6 +86,45 @@ const CopyButton = ({ text }: { text: string }) => {
         <Copy className="h-3.5 w-3.5" />
       )}
     </button>
+  );
+};
+
+const CronScheduleEditor = ({
+  cronExpression,
+  onSave,
+}: {
+  cronExpression: string;
+  onSave: (expr: string) => void;
+}) => {
+  const [value, setValue] = useState(cronExpression);
+  const dirty = value !== cronExpression;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="font-bold text-sm">Schedule</h3>
+        {dirty && (
+          <Button size="sm" onClick={() => onSave(value)} className="gap-1">
+            Save
+          </Button>
+        )}
+      </div>
+      <select
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="w-full px-3 py-2 text-sm border border-border bg-background text-foreground"
+      >
+        {CRON_PRESETS.map((preset) => (
+          <option key={preset.value} value={preset.value}>
+            {preset.label}
+          </option>
+        ))}
+      </select>
+      <p className="text-xs text-muted-foreground">
+        Cron expression:{" "}
+        <code className="font-mono text-hook">{value}</code>
+      </p>
+    </div>
   );
 };
 
@@ -327,7 +392,7 @@ const EventLog = ({
     <h3 className="font-bold text-sm">Recent events</h3>
     {events.length === 0 ? (
       <p className="text-sm text-muted-foreground">
-        No events yet. Send a webhook to the URL above.
+        No events yet.
       </p>
     ) : (
       <div className="space-y-1">
@@ -431,6 +496,8 @@ const RouteDetailPage = () => {
     );
   }
 
+  const triggerType = (route.triggerType as string) ?? "webhook";
+  const isWebhook = triggerType === "webhook";
   const webhookUrl = `${WEBHOOK_BASE_URL}/w/${route.id}`;
 
   const updateRoute = (updates: Record<string, unknown>) => {
@@ -456,11 +523,24 @@ const RouteDetailPage = () => {
           >
             <ArrowLeft className="h-4 w-4" />
           </a>
-          <h1 className="text-lg font-bold tracking-tight">{route.name}</h1>
-          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-            <code className="text-hook">{webhookUrl}</code>
-            <CopyButton text={webhookUrl} />
+          <div className="flex items-center gap-2">
+            {isWebhook ? (
+              <Webhook className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            )}
+            <h1 className="text-lg font-bold tracking-tight">{route.name}</h1>
           </div>
+          {isWebhook ? (
+            <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+              <code className="text-hook">{webhookUrl}</code>
+              <CopyButton text={webhookUrl} />
+            </div>
+          ) : (
+            <span className="text-xs text-muted-foreground">
+              {cronToHuman((route.cronExpression as string) ?? "")}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -531,6 +611,14 @@ const RouteDetailPage = () => {
             )}
             {rightTab === "settings" && (
               <div className="p-4 space-y-8">
+                {!isWebhook && (
+                  <CronScheduleEditor
+                    cronExpression={(route.cronExpression as string) ?? "0 * * * *"}
+                    onSave={(expr) =>
+                      updateRoute({ cronExpression: expr })
+                    }
+                  />
+                )}
                 <ScriptEditor
                   code={route.scriptCode}
                   functionName={route.scriptFunctionName}

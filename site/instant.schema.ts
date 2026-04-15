@@ -7,6 +7,8 @@ const _schema = i.schema({
     }),
     routes: i.entity({
       name: i.string(),
+      triggerType: i.string().optional().indexed(),
+      cronExpression: i.string().optional(),
       destinationUrl: i.string().optional(),
       scriptCode: i.string(),
       scriptFunctionName: i.string(),

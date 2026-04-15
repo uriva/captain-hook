@@ -4,6 +4,8 @@ import { db } from "./db.ts";
 
 type Route = {
   readonly id: string;
+  readonly triggerType: "webhook" | "cron";
+  readonly cronExpression?: string;
   readonly destinationUrl?: string;
   readonly active: boolean;
   readonly scriptCode: string;
@@ -16,6 +18,19 @@ type Secret = {
   readonly name: string;
   readonly value: string;
 };
+
+type ExecutionResult =
+  | {
+    readonly ok: true;
+    readonly result: unknown;
+    readonly latencyMs: number;
+  }
+  | {
+    readonly ok: false;
+    readonly error: string;
+    readonly latencyMs: number;
+    readonly status: number;
+  };
 
 const fetchRoute = async (
   routeId: string,
@@ -32,6 +47,8 @@ const fetchRoute = async (
   return {
     route: {
       id: raw.id,
+      triggerType: raw.triggerType ?? "webhook",
+      cronExpression: raw.cronExpression,
       destinationUrl: raw.destinationUrl,
       active: raw.active,
       scriptCode: raw.scriptCode,
@@ -107,33 +124,28 @@ const logEvent = async (
   );
 };
 
-export const handleWebhook = async (
+export const executeRoute = async (
   routeId: string,
-  body: unknown,
-  headers: Record<string, string>,
-): Promise<Response> => {
+  args: Record<string, unknown>,
+): Promise<ExecutionResult> => {
   const start = performance.now();
 
-  const result = await fetchRoute(routeId);
-  if (!result) {
-    return new Response(JSON.stringify({ error: "Route not found" }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
-    });
+  const fetched = await fetchRoute(routeId);
+  if (!fetched) {
+    return { ok: false, error: "Route not found", latencyMs: 0, status: 404 };
   }
-  const { route, secrets } = result;
+  const { route, secrets } = fetched;
 
   if (!route.active) {
-    return new Response(JSON.stringify({ error: "Route is inactive" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
+    return { ok: false, error: "Route is inactive", latencyMs: 0, status: 403 };
   }
   if (!route.scriptCode) {
-    return new Response(
-      JSON.stringify({ error: "No script configured" }),
-      { status: 500, headers: { "Content-Type": "application/json" } },
-    );
+    return {
+      ok: false,
+      error: "No script configured",
+      latencyMs: 0,
+      status: 500,
+    };
   }
 
   try {
@@ -143,40 +155,48 @@ export const handleWebhook = async (
 
     const permError = verifyPermissions(signature, route);
     if (permError) {
-      const latency = performance.now() - start;
-      await logEvent(route.id, "", "error", latency, permError);
-      return new Response(JSON.stringify({ error: permError }), {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      });
+      const latencyMs = performance.now() - start;
+      await logEvent(route.id, "", "error", latencyMs, permError);
+      return { ok: false, error: permError, latencyMs, status: 403 };
     }
 
     const ctx = buildContext(secrets);
     const result = await interpret(
       program,
       route.scriptFunctionName,
-      { payload: body, headers },
+      args,
       ctx,
     );
 
-    const latency = performance.now() - start;
-    await logEvent(route.id, "", "success", latency);
+    const latencyMs = performance.now() - start;
+    await logEvent(route.id, "", "success", latencyMs);
+    return { ok: true, result, latencyMs };
+  } catch (err) {
+    const latencyMs = performance.now() - start;
+    const message = err instanceof Error ? err.message : String(err);
+    await logEvent(route.id, "", "error", latencyMs, message);
+    return { ok: false, error: message, latencyMs, status: 500 };
+  }
+};
 
+export const handleWebhook = async (
+  routeId: string,
+  body: unknown,
+  headers: Record<string, string>,
+): Promise<Response> => {
+  const result = await executeRoute(routeId, { payload: body, headers });
+  if (result.ok) {
     return new Response(
       JSON.stringify({
         ok: true,
-        result,
-        latencyMs: Math.round(latency),
+        result: result.result,
+        latencyMs: Math.round(result.latencyMs),
       }),
       { status: 200, headers: { "Content-Type": "application/json" } },
     );
-  } catch (err) {
-    const latency = performance.now() - start;
-    const message = err instanceof Error ? err.message : String(err);
-    await logEvent(route.id, "", "error", latency, message);
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
   }
+  return new Response(JSON.stringify({ error: result.error }), {
+    status: result.status,
+    headers: { "Content-Type": "application/json" },
+  });
 };
