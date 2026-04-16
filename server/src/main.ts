@@ -1,5 +1,11 @@
 import { handleWebhook } from "./handler.ts";
 import { handleCronTick } from "./cron.ts";
+import {
+  handleGetRoute,
+  handleSaveScript,
+  handleTestScript,
+  handleUpdatePermissions,
+} from "./bot-tools.ts";
 import { computeSignature, parse, tokenize } from "@uri/safescript";
 
 const corsHeaders = {
@@ -110,6 +116,23 @@ const handleRequest = async (request: Request): Promise<Response> => {
 
   if (url.pathname === "/analyze" && request.method === "POST") {
     return handleAnalyze(request);
+  }
+
+  if (url.pathname.startsWith("/bot/") && request.method === "POST") {
+    const body = (await parseJsonBody(request)) as Record<string, unknown>;
+    const botHandlers: Record<
+      string,
+      (b: Record<string, unknown>) => Promise<Response>
+    > = {
+      "/bot/get-route": handleGetRoute,
+      "/bot/save-script": handleSaveScript,
+      "/bot/update-permissions": handleUpdatePermissions,
+      "/bot/test-script": handleTestScript,
+    };
+    const handler = botHandlers[url.pathname];
+    if (handler) {
+      return withCorsHeaders(await handler(body));
+    }
   }
 
   const match = url.pathname.match(/^\/w\/([a-zA-Z0-9_-]+)$/);

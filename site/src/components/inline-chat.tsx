@@ -59,9 +59,11 @@ const ConnectedChat = ({
 };
 
 const InlineChat = ({
+  routeId,
   routeName,
   currentScript,
 }: {
+  routeId: string;
   routeName: string;
   currentScript: string;
 }) => {
@@ -71,7 +73,7 @@ const InlineChat = ({
 
   if (initialMessageRef.current === null) {
     const parts = [
-      `I'm editing a webhook automation called "${routeName}".`,
+      `I'm editing a webhook automation called "${routeName}". The route ID is ${routeId}.`,
     ];
     if (currentScript.trim()) {
       parts.push(`Current script:\n\`\`\`\n${currentScript}\n\`\`\``);
