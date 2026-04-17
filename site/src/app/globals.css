@@ -144,8 +144,19 @@
   overflow-x: auto;
 }
 
-.code-block .keyword { color: oklch(0.65 0.22 25); }
-.code-block .string { color: oklch(0.7 0.15 145); }
-.code-block .comment { color: var(--muted-foreground); font-style: italic; }
-.code-block .type { color: oklch(0.7 0.15 260); }
-.code-block .op { color: oklch(0.75 0.15 50); }
+.code-block .keyword {
+  color: oklch(0.65 0.22 25);
+}
+.code-block .string {
+  color: oklch(0.7 0.15 145);
+}
+.code-block .comment {
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+.code-block .type {
+  color: oklch(0.7 0.15 260);
+}
+.code-block .op {
+  color: oklch(0.75 0.15 50);
+}

@@ -10,16 +10,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
-  ArrowLeft,
-  Loader2,
-  Copy,
-  Check,
-  Trash2,
-  Plus,
-  X,
-  Clock,
   AlertCircle,
+  ArrowLeft,
+  Check,
+  Clock,
+  Copy,
+  Loader2,
+  Plus,
+  Trash2,
   Webhook,
+  X,
 } from "lucide-react";
 import { id as instantId } from "@instantdb/react";
 import dynamic from "next/dynamic";
@@ -41,8 +41,7 @@ const InlineChat = dynamic(
   },
 );
 
-const WEBHOOK_BASE_URL =
-  process.env.NEXT_PUBLIC_WEBHOOK_BASE_URL ||
+const WEBHOOK_BASE_URL = process.env.NEXT_PUBLIC_WEBHOOK_BASE_URL ||
   "https://captain-hook-server.uriva.deno.net";
 
 const CRON_PRESETS: ReadonlyArray<{
@@ -80,11 +79,9 @@ const CopyButton = ({ text }: { text: string }) => {
       className="text-muted-foreground hover:text-foreground transition-colors"
       title="Copy"
     >
-      {copied ? (
-        <Check className="h-3.5 w-3.5 text-hook" />
-      ) : (
-        <Copy className="h-3.5 w-3.5" />
-      )}
+      {copied
+        ? <Check className="h-3.5 w-3.5 text-hook" />
+        : <Copy className="h-3.5 w-3.5" />}
     </button>
   );
 };
@@ -104,7 +101,11 @@ const CronScheduleEditor = ({
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-sm">Schedule</h3>
         {dirty && (
-          <Button size="sm" onClick={() => onSave(value)} className="gap-1">
+          <Button
+            size="sm"
+            onClick={() => onSave(value)}
+            className="gap-1"
+          >
             Save
           </Button>
         )}
@@ -121,8 +122,7 @@ const CronScheduleEditor = ({
         ))}
       </select>
       <p className="text-xs text-muted-foreground">
-        Cron expression:{" "}
-        <code className="font-mono text-hook">{value}</code>
+        Cron expression: <code className="font-mono text-hook">{value}</code>
       </p>
     </div>
   );
@@ -159,16 +159,14 @@ const ScriptEditor = ({
         <Input
           value={editFn}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setEditFn(e.target.value)
-          }
+            setEditFn(e.target.value)}
           placeholder="Function name"
           className="font-mono text-sm"
         />
         <Textarea
           value={editCode}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-            setEditCode(e.target.value)
-          }
+            setEditCode(e.target.value)}
           rows={12}
           className="font-mono text-sm resize-y"
           spellCheck={false}
@@ -233,7 +231,10 @@ const PermissionsEditor = ({
           {hosts.map((host) => (
             <Badge key={host} variant="outline" className="gap-1 font-mono">
               {host}
-              <button onClick={() => removeHost(host)}>
+              <button
+                onClick={() =>
+                  removeHost(host)}
+              >
                 <X className="h-3 w-3" />
               </button>
             </Badge>
@@ -243,13 +244,11 @@ const PermissionsEditor = ({
           <Input
             value={newHost}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setNewHost(e.target.value)
-            }
+              setNewHost(e.target.value)}
             placeholder="api.example.com"
             className="font-mono text-sm"
             onKeyDown={(e: React.KeyboardEvent) =>
-              e.key === "Enter" && addHost()
-            }
+              e.key === "Enter" && addHost()}
           />
           <Button variant="outline" size="sm" onClick={addHost}>
             <Plus className="h-4 w-4" />
@@ -280,13 +279,11 @@ const PermissionsEditor = ({
           <Input
             value={newSecret}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setNewSecret(e.target.value)
-            }
+              setNewSecret(e.target.value)}
             placeholder="SLACK_TOKEN"
             className="font-mono text-sm"
             onKeyDown={(e: React.KeyboardEvent) =>
-              e.key === "Enter" && addSecret()
-            }
+              e.key === "Enter" && addSecret()}
           />
           <Button variant="outline" size="sm" onClick={addSecret}>
             <Plus className="h-4 w-4" />
@@ -355,16 +352,14 @@ const SecretsManager = ({
         <Input
           value={newName}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setNewName(e.target.value)
-          }
+            setNewName(e.target.value)}
           placeholder="Name"
           className="font-mono text-sm"
         />
         <Input
           value={newValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setNewValue(e.target.value)
-          }
+            setNewValue(e.target.value)}
           placeholder="Value"
           type="password"
           className="font-mono text-sm"
@@ -390,38 +385,44 @@ const EventLog = ({
 }) => (
   <div className="space-y-3">
     <h3 className="font-bold text-sm">Recent events</h3>
-    {events.length === 0 ? (
-      <p className="text-sm text-muted-foreground">
-        No events yet.
-      </p>
-    ) : (
-      <div className="space-y-1">
-        {events
-          .sort((a, b) => b.timestamp - a.timestamp)
-          .slice(0, 50)
-          .map((event) => (
-            <div
-              key={event.id}
-              className="flex items-center gap-3 text-xs py-2 border-b border-border last:border-0"
-            >
+    {events.length === 0
+      ? (
+        <p className="text-sm text-muted-foreground">
+          No events yet.
+        </p>
+      )
+      : (
+        <div className="space-y-1">
+          {events
+            .sort((a, b) => b.timestamp - a.timestamp)
+            .slice(0, 50)
+            .map((event) => (
               <div
-                className={`h-1.5 w-1.5 shrink-0 ${event.status === "success" ? "bg-green-500" : "bg-destructive"}`}
-              />
-              <span className="font-mono text-muted-foreground">
-                <Clock className="h-3 w-3 inline mr-1" />
-                {new Date(event.timestamp).toLocaleString()}
-              </span>
-              <span className="font-mono">{event.latencyMs}ms</span>
-              {event.errorMessage && (
-                <span className="text-destructive flex items-center gap-1 truncate">
-                  <AlertCircle className="h-3 w-3 shrink-0" />
-                  {event.errorMessage}
+                key={event.id}
+                className="flex items-center gap-3 text-xs py-2 border-b border-border last:border-0"
+              >
+                <div
+                  className={`h-1.5 w-1.5 shrink-0 ${
+                    event.status === "success"
+                      ? "bg-green-500"
+                      : "bg-destructive"
+                  }`}
+                />
+                <span className="font-mono text-muted-foreground">
+                  <Clock className="h-3 w-3 inline mr-1" />
+                  {new Date(event.timestamp).toLocaleString()}
                 </span>
-              )}
-            </div>
-          ))}
-      </div>
-    )}
+                <span className="font-mono">{event.latencyMs}ms</span>
+                {event.errorMessage && (
+                  <span className="text-destructive flex items-center gap-1 truncate">
+                    <AlertCircle className="h-3 w-3 shrink-0" />
+                    {event.errorMessage}
+                  </span>
+                )}
+              </div>
+            ))}
+        </div>
+      )}
   </div>
 );
 
@@ -457,12 +458,12 @@ const RouteDetailPage = () => {
   const { isLoading, error, data } = db.useQuery(
     user
       ? {
-          routes: {
-            secrets: {},
-            events: {},
-            $: { where: { id: routeId, "owner.id": user.id } },
-          },
-        }
+        routes: {
+          secrets: {},
+          events: {},
+          $: { where: { id: routeId, "owner.id": user.id } },
+        },
+      }
       : null,
   );
 
@@ -477,9 +478,7 @@ const RouteDetailPage = () => {
   }
 
   if (error) {
-    return (
-      <p className="text-sm text-destructive">Error: {error.message}</p>
-    );
+    return <p className="text-sm text-destructive">Error: {error.message}</p>;
   }
 
   if (!route) {
@@ -524,23 +523,23 @@ const RouteDetailPage = () => {
             <ArrowLeft className="h-4 w-4" />
           </a>
           <div className="flex items-center gap-2">
-            {isWebhook ? (
-              <Webhook className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            )}
+            {isWebhook
+              ? <Webhook className="h-4 w-4 text-muted-foreground" />
+              : <Clock className="h-4 w-4 text-muted-foreground" />}
             <h1 className="text-lg font-bold tracking-tight">{route.name}</h1>
           </div>
-          {isWebhook ? (
-            <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-              <code className="text-hook">{webhookUrl}</code>
-              <CopyButton text={webhookUrl} />
-            </div>
-          ) : (
-            <span className="text-xs text-muted-foreground">
-              {cronToHuman((route.cronExpression as string) ?? "")}
-            </span>
-          )}
+          {isWebhook
+            ? (
+              <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+                <code className="text-hook">{webhookUrl}</code>
+                <CopyButton text={webhookUrl} />
+              </div>
+            )
+            : (
+              <span className="text-xs text-muted-foreground">
+                {cronToHuman((route.cronExpression as string) ?? "")}
+              </span>
+            )}
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -548,8 +547,7 @@ const RouteDetailPage = () => {
             <Switch
               checked={route.active}
               onCheckedChange={(checked: boolean) =>
-                updateRoute({ active: checked })
-              }
+                updateRoute({ active: checked })}
             />
           </div>
           <Button
@@ -614,10 +612,9 @@ const RouteDetailPage = () => {
               <div className="p-4 space-y-8">
                 {!isWebhook && (
                   <CronScheduleEditor
-                    cronExpression={(route.cronExpression as string) ?? "0 * * * *"}
-                    onSave={(expr) =>
-                      updateRoute({ cronExpression: expr })
-                    }
+                    cronExpression={(route.cronExpression as string) ??
+                      "0 * * * *"}
+                    onSave={(expr) => updateRoute({ cronExpression: expr })}
                   />
                 )}
                 <ScriptEditor
@@ -627,43 +624,35 @@ const RouteDetailPage = () => {
                     updateRoute({
                       scriptCode: code,
                       scriptFunctionName: fn,
-                    })
-                  }
+                    })}
                 />
                 <PermissionsEditor
                   allowedHosts={parsedHosts}
                   allowedSecrets={parsedSecrets}
-                  onSaveHosts={(hosts) =>
-                    updateRoute({ allowedHosts: hosts })
-                  }
+                  onSaveHosts={(hosts) => updateRoute({ allowedHosts: hosts })}
                   onSaveSecrets={(secrets) =>
-                    updateRoute({ allowedSecrets: secrets })
-                  }
+                    updateRoute({ allowedSecrets: secrets })}
                 />
                 <SecretsManager
                   routeId={route.id}
-                  secrets={
-                    (route.secrets ?? []) as Array<{
-                      id: string;
-                      name: string;
-                      value: string;
-                    }>
-                  }
+                  secrets={(route.secrets ?? []) as Array<{
+                    id: string;
+                    name: string;
+                    value: string;
+                  }>}
                 />
               </div>
             )}
             {rightTab === "events" && (
               <div className="p-4">
                 <EventLog
-                  events={
-                    (route.events ?? []) as Array<{
-                      id: string;
-                      status: string;
-                      latencyMs: number;
-                      errorMessage?: string;
-                      timestamp: number;
-                    }>
-                  }
+                  events={(route.events ?? []) as Array<{
+                    id: string;
+                    status: string;
+                    latencyMs: number;
+                    errorMessage?: string;
+                    timestamp: number;
+                  }>}
                 />
               </div>
             )}

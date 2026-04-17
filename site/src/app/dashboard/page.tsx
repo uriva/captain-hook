@@ -6,19 +6,19 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Plus,
-  ChevronRight,
   Activity,
-  Loader2,
-  Copy,
   Check,
+  ChevronRight,
   Clock,
+  Copy,
+  Loader2,
+  Plus,
   Webhook,
 } from "lucide-react";
 import { id } from "@instantdb/react";
 
-const WEBHOOK_BASE_URL =
-  process.env.NEXT_PUBLIC_WEBHOOK_BASE_URL || "https://captain-hook.deno.dev";
+const WEBHOOK_BASE_URL = process.env.NEXT_PUBLIC_WEBHOOK_BASE_URL ||
+  "https://captain-hook.deno.dev";
 
 const CRON_PRESETS: ReadonlyArray<{
   readonly label: string;
@@ -55,11 +55,9 @@ const CopyButton = ({ text }: { text: string }) => {
       className="text-muted-foreground hover:text-foreground transition-colors"
       title="Copy"
     >
-      {copied ? (
-        <Check className="h-3.5 w-3.5 text-hook" />
-      ) : (
-        <Copy className="h-3.5 w-3.5" />
-      )}
+      {copied
+        ? <Check className="h-3.5 w-3.5 text-hook" />
+        : <Copy className="h-3.5 w-3.5" />}
     </button>
   );
 };
@@ -108,12 +106,10 @@ const CreateRouteForm = ({
           placeholder="Name (e.g. Stripe to Slack)"
           value={name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setName(e.target.value)
-          }
+            setName(e.target.value)}
           autoFocus
           onKeyDown={(e: React.KeyboardEvent) =>
-            e.key === "Enter" && handleCreate()
-          }
+            e.key === "Enter" && handleCreate()}
         />
         <div className="flex gap-2">
           <button
@@ -194,37 +190,43 @@ const RouteRow = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
           <div
-            className={`h-2 w-2 shrink-0 ${route.active ? "bg-green-500" : "bg-muted-foreground/30"}`}
+            className={`h-2 w-2 shrink-0 ${
+              route.active ? "bg-green-500" : "bg-muted-foreground/30"
+            }`}
           />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              {isWebhook ? (
-                <Webhook className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              ) : (
-                <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              )}
+              {isWebhook
+                ? (
+                  <Webhook className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                )
+                : (
+                  <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                )}
               <p className="font-bold text-sm truncate">{route.name}</p>
             </div>
             <div className="flex items-center gap-2 mt-1">
-              {isWebhook ? (
-                <>
-                  <code className="text-xs text-muted-foreground font-mono truncate max-w-[300px]">
-                    {webhookUrl}
-                  </code>
-                  <span
-                    onClick={(e) => e.preventDefault()}
-                    onKeyDown={() => {}}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <CopyButton text={webhookUrl} />
+              {isWebhook
+                ? (
+                  <>
+                    <code className="text-xs text-muted-foreground font-mono truncate max-w-[300px]">
+                      {webhookUrl}
+                    </code>
+                    <span
+                      onClick={(e) => e.preventDefault()}
+                      onKeyDown={() => {}}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      <CopyButton text={webhookUrl} />
+                    </span>
+                  </>
+                )
+                : (
+                  <span className="text-xs text-muted-foreground">
+                    {cronToHuman(route.cronExpression ?? "")}
                   </span>
-                </>
-              ) : (
-                <span className="text-xs text-muted-foreground">
-                  {cronToHuman(route.cronExpression ?? "")}
-                </span>
-              )}
+                )}
             </div>
           </div>
         </div>
@@ -247,11 +249,11 @@ const DashboardPage = () => {
   const { isLoading, error, data } = db.useQuery(
     user
       ? {
-          routes: {
-            events: {},
-            $: { where: { "owner.id": user.id } },
-          },
-        }
+        routes: {
+          events: {},
+          $: { where: { "owner.id": user.id } },
+        },
+      }
       : null,
   );
 
@@ -314,9 +316,7 @@ const DashboardPage = () => {
               cronExpression?: string;
               createdAt: number;
               events?: Array<{ id: string }>;
-            }) => (
-              <RouteRow key={route.id} route={route} />
-            ),
+            }) => <RouteRow key={route.id} route={route} />,
           )}
       </div>
     </div>

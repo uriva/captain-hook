@@ -1,6 +1,12 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
-import { Anchor, ArrowRight, MessageSquare, ShieldCheck, Zap } from "lucide-react";
+import {
+  Anchor,
+  ArrowRight,
+  MessageSquare,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const GithubIcon = ({ className }: { className?: string }) => (
@@ -17,7 +23,10 @@ const GithubIcon = ({ className }: { className?: string }) => (
 const Header = () => (
   <header className="border-b border-border">
     <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-      <a href="/" className="flex items-center gap-2 font-mono text-sm font-bold tracking-tight">
+      <a
+        href="/"
+        className="flex items-center gap-2 font-mono text-sm font-bold tracking-tight"
+      >
         <Anchor className="h-5 w-5 text-hook" />
         <span>captain hook</span>
       </a>
@@ -74,7 +83,8 @@ const HeroSection = () => (
 const chatMessages = [
   {
     role: "user" as const,
-    text: "When I get a Stripe payment, send a message to our #sales channel on Slack with the customer name and amount.",
+    text:
+      "When I get a Stripe payment, send a message to our #sales channel on Slack with the customer name and amount.",
   },
   {
     role: "assistant" as const,
@@ -82,7 +92,8 @@ const chatMessages = [
   },
   {
     role: "assistant" as const,
-    text: "Receives Stripe payment webhooks, extracts the customer name and amount, and posts a formatted message to #sales on Slack. It only talks to hooks.slack.com and reads your Slack token. Nothing else.",
+    text:
+      "Receives Stripe payment webhooks, extracts the customer name and amount, and posts a formatted message to #sales on Slack. It only talks to hooks.slack.com and reads your Slack token. Nothing else.",
   },
 ];
 
@@ -238,7 +249,13 @@ const ComparisonSection = () => (
               ["Zapier", "Drag-and-drop builder", "None", "No", "100 tasks/mo"],
               ["Make", "Drag-and-drop builder", "None", "No", "1k ops/mo"],
               ["n8n", "Drag-and-drop builder", "None", "Yes", "Self-host only"],
-              ["EventBridge", "JSON templates", "Limited", "No", "Pay per event"],
+              [
+                "EventBridge",
+                "JSON templates",
+                "Limited",
+                "No",
+                "Pay per event",
+              ],
               [
                 "Captain Hook",
                 "Describe in plain English",
@@ -254,26 +271,20 @@ const ComparisonSection = () => (
                 }`}
               >
                 <td className="p-3 font-mono font-bold">
-                  {tool === "Captain Hook" ? (
-                    <span className="text-hook">{tool}</span>
-                  ) : (
-                    tool
-                  )}
+                  {tool === "Captain Hook"
+                    ? <span className="text-hook">{tool}</span>
+                    : tool}
                 </td>
                 <td className="p-3">
-                  {tool === "Captain Hook" ? (
-                    <span className="text-hook font-bold">{setup}</span>
-                  ) : (
-                    setup
-                  )}
+                  {tool === "Captain Hook"
+                    ? <span className="text-hook font-bold">{setup}</span>
+                    : setup}
                 </td>
                 <td className="p-3">{visibility}</td>
                 <td className="p-3">
-                  {tool === "Captain Hook" ? (
-                    <span className="text-hook font-bold">{oss}</span>
-                  ) : (
-                    oss
-                  )}
+                  {tool === "Captain Hook"
+                    ? <span className="text-hook font-bold">{oss}</span>
+                    : oss}
                 </td>
                 <td className="p-3">{free}</td>
               </tr>
@@ -300,7 +311,7 @@ const HowItWorksSection = () => (
             step: "01",
             title: "Describe the connection",
             description:
-              "Tell Captain Hook what you want. \"When Stripe sends a payment, post it to Slack.\" That's it. The AI figures out the rest.",
+              'Tell Captain Hook what you want. "When Stripe sends a payment, post it to Slack." That\'s it. The AI figures out the rest.',
           },
           {
             step: "02",
@@ -364,7 +375,10 @@ const PricingSection = () => (
             Need more volume? Priority support? Custom deployment? Reach out and
             we&apos;ll figure it out.
           </p>
-          <a href="mailto:uri.valevski@gmail.com" className={cn(buttonVariants({ variant: "outline" }), "w-full")}>
+          <a
+            href="mailto:uri.valevski@gmail.com"
+            className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+          >
             Contact us
           </a>
         </div>

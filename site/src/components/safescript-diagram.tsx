@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Loader2, AlertCircle } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { AlertCircle, Loader2 } from "lucide-react";
 
-const ANALYZE_URL =
-  process.env.NEXT_PUBLIC_ANALYZE_URL ||
+const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL ||
   "https://captain-hook-server.uriva.deno.net/analyze";
 
 type SignatureData = {
@@ -142,13 +141,40 @@ const layoutNodes = (
   };
 };
 
-const kindColors: Record<NodeInfo["kind"], { bg: string; border: string; text: string }> = {
-  param: { bg: "var(--card)", border: "var(--border)", text: "var(--foreground)" },
-  env: { bg: "var(--card)", border: "var(--border)", text: "var(--muted-foreground)" },
-  "secret-read": { bg: "var(--card)", border: "var(--hook)", text: "var(--hook)" },
-  "secret-write": { bg: "var(--card)", border: "var(--hook)", text: "var(--hook)" },
-  host: { bg: "var(--card)", border: "var(--foreground)", text: "var(--foreground)" },
-  return: { bg: "var(--card)", border: "var(--foreground)", text: "var(--foreground)" },
+const kindColors: Record<
+  NodeInfo["kind"],
+  { bg: string; border: string; text: string }
+> = {
+  param: {
+    bg: "var(--card)",
+    border: "var(--border)",
+    text: "var(--foreground)",
+  },
+  env: {
+    bg: "var(--card)",
+    border: "var(--border)",
+    text: "var(--muted-foreground)",
+  },
+  "secret-read": {
+    bg: "var(--card)",
+    border: "var(--hook)",
+    text: "var(--hook)",
+  },
+  "secret-write": {
+    bg: "var(--card)",
+    border: "var(--hook)",
+    text: "var(--hook)",
+  },
+  host: {
+    bg: "var(--card)",
+    border: "var(--foreground)",
+    text: "var(--foreground)",
+  },
+  return: {
+    bg: "var(--card)",
+    border: "var(--foreground)",
+    text: "var(--foreground)",
+  },
 };
 
 const kindLabels: Record<NodeInfo["kind"], string> = {
@@ -248,12 +274,8 @@ const DiagramSvg = ({ data }: { data: SignatureData }) => {
           />
         </marker>
       </defs>
-      {edges.map((edge, i) => (
-        <DiagramEdge key={`e-${i}`} edge={edge} />
-      ))}
-      {nodes.map((node, i) => (
-        <DiagramNode key={`n-${i}`} node={node} />
-      ))}
+      {edges.map((edge, i) => <DiagramEdge key={`e-${i}`} edge={edge} />)}
+      {nodes.map((node, i) => <DiagramNode key={`n-${i}`} node={node} />)}
     </svg>
   );
 };
@@ -267,12 +289,14 @@ const ResourceBadge = ({
   value: number;
   unit: string;
 }) =>
-  value > 0 ? (
-    <span className="text-xs font-mono text-muted-foreground">
-      {label}: {value}
-      {unit}
-    </span>
-  ) : null;
+  value > 0
+    ? (
+      <span className="text-xs font-mono text-muted-foreground">
+        {label}: {value}
+        {unit}
+      </span>
+    )
+    : null;
 
 const SafescriptDiagram = ({
   code,

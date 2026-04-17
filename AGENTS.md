@@ -4,7 +4,8 @@
 
 - `server/` — Deno webhook server (deployed to Deno Deploy)
 - `site/` — Next.js landing page + dashboard (deployed to Deno Deploy)
-- `bot-prompt.md` — System prompt for the AI script assistant bot (on prompt2bot)
+- `bot-prompt.md` — System prompt for the AI script assistant bot (on
+  prompt2bot)
 
 ## Coding conventions
 
@@ -28,6 +29,7 @@ Key deps: `@uri/safescript`, `jsr:@uri/gamla`, `@instantdb/admin`.
 Entry point: `server/src/main.ts`.
 
 Routes:
+
 - `POST /w/:routeId` — receive webhook, transform, forward
 - `POST /analyze` — accepts `{ code, functionName }`, returns serialized
   `computeSignature` result
@@ -35,6 +37,7 @@ Routes:
 - `Deno.cron("hourly-tick", "0 * * * *", handler)` — hourly cron ticker
 
 Trigger types:
+
 - **Webhook** (`triggerType: "webhook"`): HTTP trigger via `POST /w/:routeId`.
   Script receives `{ payload, headers }`.
 - **Cron** (`triggerType: "cron"`): Scheduled trigger. Script receives `{}`
@@ -44,6 +47,7 @@ Trigger types:
   `?? "webhook"` fallback in all code paths).
 
 Key files:
+
 - `server/src/handler.ts` — `executeRoute` (shared execution logic),
   `handleWebhook` (HTTP wrapper). Route type includes `triggerType` and
   `cronExpression`.
@@ -54,12 +58,12 @@ Key files:
 
 Deployed at `https://captain-hook-server.uriva.deno.net`.
 
-Type check with: `deno fmt --check && deno lint && deno check server/src/main.ts`
+Type check with:
+`deno fmt --check && deno lint && deno check server/src/main.ts`
 
 ## Site (`site/`)
 
-Next.js project with npm deps. `site/deno.json` has
-`"nodeModulesDir": "auto"`.
+Next.js project with npm deps. `site/deno.json` has `"nodeModulesDir": "auto"`.
 
 Deno LSP shows false errors for npm packages in this directory. These are not
 real issues. The actual build check is `npx next build` from `site/`.
@@ -68,6 +72,7 @@ shadcn/ui with base-nova style, 0rem radius, oklch colors, crimson accent
 (`--hook`). DM Sans + JetBrains Mono fonts.
 
 Key patterns:
+
 - `lucide-react` has no `Github` icon. Use inline SVG component `GithubIcon`.
 - shadcn Button has no `asChild`. Use `buttonVariants` for links styled as
   buttons.
@@ -92,8 +97,8 @@ Push permissions with: `npx instant-cli push perms --yes` from `site/`.
 
 Both apps deploy via `deno deploy --prod` from their respective directories.
 
-Server org: `uriva`, app: `captain-hook-server`.
-Site org: `uriva`, app: `captain-hook`.
+Server org: `uriva`, app: `captain-hook-server`. Site org: `uriva`, app:
+`captain-hook`.
 
 URL format: `https://{app}.{org}.deno.net`
 
@@ -102,9 +107,9 @@ Site uses `.npmrc` with `ignore-scripts=true` to avoid msw postinstall failures.
 
 ## AI assistant
 
-The route detail page has a split-screen layout: inline chat (left) and
-tabs (right) for diagram, settings, and events. The chat connects to a
-prompt2bot bot whose system prompt is in `bot-prompt.md`.
+The route detail page has a split-screen layout: inline chat (left) and tabs
+(right) for diagram, settings, and events. The chat connects to a prompt2bot bot
+whose system prompt is in `bot-prompt.md`.
 
 alice-and-bot chat is loaded via `next/dynamic` with `ssr: false` to avoid
 `crypto.subtle` SSR issues. Uses `@alice-and-bot/core` from JSR (installed via
@@ -120,5 +125,6 @@ The widget loads from
 ## Pre-commit hook
 
 `.git/hooks/pre-commit` runs:
+
 - `deno fmt --check && deno lint && deno check` on server
 - `npx next build` on site

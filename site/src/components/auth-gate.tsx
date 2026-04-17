@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Anchor, Mail, ArrowRight, Loader2 } from "lucide-react";
+import { Anchor, ArrowRight, Loader2, Mail } from "lucide-react";
 
 const SignInForm = ({
   onSendCode,
@@ -62,72 +62,66 @@ const SignInForm = ({
           <p className="text-sm text-destructive text-center">{error}</p>
         )}
 
-        {step === "email" ? (
-          <div className="space-y-3">
-            <Input
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEmail(e.target.value)
-              }
-              onKeyDown={(e: React.KeyboardEvent) =>
-                e.key === "Enter" && handleSendCode()
-              }
-              autoFocus
-            />
-            <Button
-              onClick={handleSendCode}
-              disabled={!email.trim() || loading}
-              className="w-full gap-2"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Mail className="h-4 w-4" />
-              )}
-              Send magic code
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <Input
-              type="text"
-              placeholder="Enter 6-digit code"
-              value={code}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setCode(e.target.value)
-              }
-              onKeyDown={(e: React.KeyboardEvent) =>
-                e.key === "Enter" && handleVerifyCode()
-              }
-              autoFocus
-              className="text-center font-mono tracking-widest text-lg"
-            />
-            <Button
-              onClick={handleVerifyCode}
-              disabled={!code.trim() || loading}
-              className="w-full gap-2"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <ArrowRight className="h-4 w-4" />
-              )}
-              Verify
-            </Button>
-            <button
-              onClick={() => {
-                setStep("email");
-                setCode("");
-                setError(null);
-              }}
-              className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Use a different email
-            </button>
-          </div>
-        )}
+        {step === "email"
+          ? (
+            <div className="space-y-3">
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setEmail(e.target.value)}
+                onKeyDown={(e: React.KeyboardEvent) =>
+                  e.key === "Enter" && handleSendCode()}
+                autoFocus
+              />
+              <Button
+                onClick={handleSendCode}
+                disabled={!email.trim() || loading}
+                className="w-full gap-2"
+              >
+                {loading
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : <Mail className="h-4 w-4" />}
+                Send magic code
+              </Button>
+            </div>
+          )
+          : (
+            <div className="space-y-3">
+              <Input
+                type="text"
+                placeholder="Enter 6-digit code"
+                value={code}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setCode(e.target.value)}
+                onKeyDown={(e: React.KeyboardEvent) =>
+                  e.key === "Enter" && handleVerifyCode()}
+                autoFocus
+                className="text-center font-mono tracking-widest text-lg"
+              />
+              <Button
+                onClick={handleVerifyCode}
+                disabled={!code.trim() || loading}
+                className="w-full gap-2"
+              >
+                {loading
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : <ArrowRight className="h-4 w-4" />}
+                Verify
+              </Button>
+              <button
+                onClick={() => {
+                  setStep("email");
+                  setCode("");
+                  setError(null);
+                }}
+                className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Use a different email
+              </button>
+            </div>
+          )}
       </div>
     </div>
   );
