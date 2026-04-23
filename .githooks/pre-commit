@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+echo "Checking server..."
+cd server
+deno fmt --check
+deno lint
+deno check src/main.ts
+
+echo "Checking site..."
+cd ../site
+npx next build > /dev/null 2>&1
+
+echo "All checks passed."
