@@ -3,6 +3,9 @@ import { buttonVariants } from "@/components/ui/button";
 import {
   Anchor,
   ArrowRight,
+  Calendar,
+  Clock,
+  Lock,
   MessageSquare,
   ShieldCheck,
   Zap,
@@ -31,6 +34,12 @@ const Header = () => (
         <span>captain hook</span>
       </a>
       <div className="flex items-center gap-3">
+        <a
+          href="/docs"
+          className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors mr-2"
+        >
+          Docs
+        </a>
         <a
           href="https://github.com/uriva/captain-hook"
           target="_blank"
@@ -170,6 +179,24 @@ const features = [
         , a lightweight language that&apos;s safe by design.
       </p>
     ),
+  },
+  {
+    icon: Lock,
+    title: "AST Secrets Sandbox",
+    description:
+      "Manage environment variables and API tokens securely. Abstract syntax tree analysis guarantees secrets are only ever read by verified code permissions.",
+  },
+  {
+    icon: Clock,
+    title: "Timing & Cron Jobs",
+    description:
+      "Set up recurring cron-like triggers directly inside the dashboard to execute your safescripts periodically (up to hourly intervals).",
+  },
+  {
+    icon: Calendar,
+    title: "Scheduled Run API",
+    description:
+      "Schedule script executions at precise future timestamps using Upstash QStash, with zero-infrastructure and automated fallback to local queues.",
   },
 ];
 
@@ -394,7 +421,13 @@ const Footer = () => (
         <Anchor className="h-3.5 w-3.5 inline-block mr-1 text-hook" />
         captain hook
       </p>
-      <div className="flex gap-6">
+      <div className="flex gap-6 font-mono text-xs">
+        <a href="/docs" className="hover:text-foreground transition-colors">
+          Docs
+        </a>
+        <a href="/llms.txt" className="hover:text-foreground transition-colors">
+          llms.txt
+        </a>
         <a
           href="https://github.com/uriva/captain-hook"
           target="_blank"

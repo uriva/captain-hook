@@ -27,6 +27,13 @@ const _schema = i.schema({
       errorMessage: i.string().optional(),
       timestamp: i.number().indexed(),
     }),
+    scheduledRuns: i.entity({
+      timestamp: i.number().indexed(),
+      payload: i.string().optional(),
+      status: i.string().indexed(),
+      errorMessage: i.string().optional(),
+      qstashMessageId: i.string().optional().indexed(),
+    }),
   },
   links: {
     userRoutes: {
@@ -63,6 +70,15 @@ const _schema = i.schema({
         label: "user",
       },
       reverse: { on: "$users", has: "many", label: "events" },
+    },
+    routeScheduledRuns: {
+      forward: {
+        on: "scheduledRuns",
+        has: "one",
+        label: "route",
+        onDelete: "cascade",
+      },
+      reverse: { on: "routes", has: "many", label: "scheduledRuns" },
     },
   },
 });

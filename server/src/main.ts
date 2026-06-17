@@ -1,5 +1,5 @@
-import { handleWebhook } from "./handler.ts";
-import { handleCronTick } from "./cron.ts";
+import { handleSchedule, handleWebhook } from "./handler.ts";
+import { handleTick } from "./cron.ts";
 import {
   handleGetRoute,
   handleSaveScript,
@@ -135,6 +135,15 @@ const handleRequest = async (request: Request): Promise<Response> => {
     }
   }
 
+  const scheduleMatch = url.pathname.match(/^\/w\/([a-zA-Z0-9_-]+)\/schedule$/);
+
+  if (scheduleMatch && request.method === "POST") {
+    const routeId = scheduleMatch[1];
+    const body = await parseJsonBody(request);
+    const response = await handleSchedule(routeId, body, request);
+    return withCorsHeaders(response);
+  }
+
   const match = url.pathname.match(/^\/w\/([a-zA-Z0-9_-]+)$/);
 
   if (match && request.method === "POST") {
@@ -160,6 +169,6 @@ const handleRequest = async (request: Request): Promise<Response> => {
 
 const port = parseInt(Deno.env.get("PORT") ?? "8000");
 
-Deno.cron("hourly-tick", "0 * * * *", handleCronTick);
+Deno.cron("minutely-tick", "* * * * *", handleTick);
 
 Deno.serve({ port }, handleRequest);

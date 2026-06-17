@@ -24,6 +24,14 @@ const perms = {
       delete: "auth.id in data.ref('route.owner.id')",
     },
   },
+  scheduledRuns: {
+    allow: {
+      view: "auth.id in data.ref('route.owner.id')",
+      create: "true",
+      update: "auth.id in data.ref('route.owner.id')",
+      delete: "auth.id in data.ref('route.owner.id')",
+    },
+  },
 };
 
 export { perms as default };
