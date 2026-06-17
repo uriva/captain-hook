@@ -150,15 +150,15 @@ const ChatDemo = () => (
 const features = [
   {
     icon: MessageSquare,
-    title: "Just describe it",
+    title: "AI does the coding, not you",
     description:
-      "Tell the AI what you want connected in plain English. Stripe to Slack, GitHub to email, a CRM to a spreadsheet. It writes the integration for you.",
+      "Stop dragging boxes in confusing diagrams. Just talk to the AI assistant in plain English—e.g., 'when Stripe payment succeeds, post it to Slack'. The AI writes 100% of the integration code for you.",
   },
   {
     icon: ShieldCheck,
-    title: "See where your data goes",
+    title: "Diagrams are for security, not building",
     description:
-      "Before anything runs, Captain Hook shows you exactly which services will receive your data and which secrets get used. You approve the connections, not the code.",
+      "You don't waste hours connecting boxes. The diagram is generated automatically by analyzing the AI's code to prove exactly where your data flows and which secrets get read before anything runs.",
   },
   {
     icon: Zap,
