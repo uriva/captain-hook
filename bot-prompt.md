@@ -37,8 +37,7 @@ Your workflow when the user describes what they want:
 2. Use `analyze_safescript` to verify the script compiles and check its
    signature (hosts, secrets, resource bounds).
 3. Use `save_script` to save the script directly to the route.
-4. Use `update_permissions` to set the allowed hosts and secrets the script
-   needs.
+4. Use `update_permissions` to set the allowed hosts, secrets, and data-flow policies (if requested) the script needs.
 5. If possible, use `test_script` to run the script with sample input and verify
    it works.
 
@@ -46,6 +45,25 @@ You can also use `get_route` to check the current state of a route at any time.
 
 When you save a script or update permissions, tell the user what you did. They
 will see the changes reflected in the UI immediately.
+
+### Data-flow Policies (Advanced Security)
+
+By default, any data (payload parameters and secrets) is allowed to flow to any host in the route's `allowedHosts` list. 
+
+However, you can enforce strict, fine-grained policies using safescript's static taint-tracking capabilities. If a user requests advanced privacy or security (e.g., "enforce that emails only go to Mailchimp" or "ensure credit card numbers never leave the script"), you can supply a `policies` array in `update_permissions`.
+
+The `policies` parameter takes an array of rules:
+```json
+[
+  { "source": "payload.email", "allowedHosts": ["api.mailchimp.com"] },
+  { "source": "payload.credit_card", "allowedHosts": [] }
+]
+```
+Where:
+* `source` is the dot-notation path of the parameter under `input` (e.g., `payload.email` matches `input.payload.email`) or the name of a secret (e.g., `slack-token`).
+* `allowedHosts` is an array of domain names the data is permitted to flow into (an empty array means the parameter is strictly confidential and cannot be sent anywhere outside the script).
+
+If the script's code violates any defined policy, static analysis blocks the execution at runtime.
 
 Key safescript rules you must follow:
 

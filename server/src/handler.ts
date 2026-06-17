@@ -12,6 +12,10 @@ type Route = {
   readonly scriptFunctionName: string;
   readonly allowedHosts: readonly string[];
   readonly allowedSecrets: readonly string[];
+  readonly policies?: readonly {
+    readonly source: string;
+    readonly allowedHosts: readonly string[];
+  }[];
 };
 
 type Secret = {
@@ -55,6 +59,7 @@ const fetchRoute = async (
       scriptFunctionName: raw.scriptFunctionName,
       allowedHosts: raw.allowedHosts ?? [],
       allowedSecrets: raw.allowedSecrets ?? [],
+      policies: raw.policies ?? [],
     },
     secrets: (raw.secrets ?? []).map(
       // deno-lint-ignore no-explicit-any
@@ -87,6 +92,26 @@ const verifyPermissions = (
       disallowedWriteSecrets.join(", ")
     }`;
   }
+
+  // Enforce AST-level data-flow policies (Safescript taint analysis)
+  if (route.policies && route.policies.length > 0) {
+    for (const policy of route.policies) {
+      for (const [source, hosts] of signature.dataFlow.entries()) {
+        const cleanSource = source.replace(/^(param:input\.|secret:)/, "");
+        if (
+          cleanSource === policy.source ||
+          cleanSource.startsWith(policy.source + ".")
+        ) {
+          for (const host of hosts) {
+            if (!policy.allowedHosts.includes(host)) {
+              return `Data-flow policy violation: Sensitive data from "${cleanSource}" is flowing to unauthorized host "${host}"`;
+            }
+          }
+        }
+      }
+    }
+  }
+
   return null;
 };
 

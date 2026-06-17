@@ -32,6 +32,7 @@ export const handleGetRoute = async (
     scriptFunctionName: route.scriptFunctionName ?? "",
     allowedHosts: route.allowedHosts ?? [],
     allowedSecrets: route.allowedSecrets ?? [],
+    policies: route.policies ?? [],
     active: route.active,
   });
 };
@@ -65,6 +66,9 @@ export const handleUpdatePermissions = async (
   const routeId = body.routeId as string | undefined;
   const allowedHosts = body.allowedHosts as string[] | undefined;
   const allowedSecrets = body.allowedSecrets as string[] | undefined;
+  const policies = body.policies as
+    | Array<{ source: string; allowedHosts: string[] }>
+    | undefined;
   if (!routeId) {
     return jsonResponse({ error: "Missing routeId" }, 400);
   }
@@ -75,9 +79,10 @@ export const handleUpdatePermissions = async (
   const updates: Record<string, unknown> = {};
   if (allowedHosts !== undefined) updates.allowedHosts = allowedHosts;
   if (allowedSecrets !== undefined) updates.allowedSecrets = allowedSecrets;
+  if (policies !== undefined) updates.policies = policies;
   if (Object.keys(updates).length === 0) {
     return jsonResponse(
-      { error: "Provide allowedHosts or allowedSecrets" },
+      { error: "Provide allowedHosts, allowedSecrets, or policies" },
       400,
     );
   }

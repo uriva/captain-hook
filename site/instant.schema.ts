@@ -14,6 +14,7 @@ const _schema = i.schema({
       scriptFunctionName: i.string(),
       allowedHosts: i.json<string[]>(),
       allowedSecrets: i.json<string[]>(),
+      policies: i.json<any>().optional(),
       active: i.boolean().indexed(),
       createdAt: i.number().indexed(),
     }),

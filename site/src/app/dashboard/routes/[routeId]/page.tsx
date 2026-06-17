@@ -294,6 +294,122 @@ const PermissionsEditor = ({
   );
 };
 
+const PoliciesEditor = ({
+  policies,
+  onSave,
+}: {
+  policies: Array<{ source: string; allowedHosts: string[] }>;
+  onSave: (policies: Array<{ source: string; allowedHosts: string[] }>) => void;
+}) => {
+  const [newSource, setNewSource] = useState("");
+  const [newHostsRaw, setNewHostsRaw] = useState("");
+
+  const addPolicy = () => {
+    if (!newSource.trim()) return;
+    const allowedHosts = newHostsRaw
+      .split(",")
+      .map((h) => h.trim())
+      .filter(Boolean);
+    const updated = [...policies, { source: newSource.trim(), allowedHosts }];
+    onSave(updated);
+    setNewSource("");
+    setNewHostsRaw("");
+  };
+
+  const removePolicy = (index: number) => {
+    const updated = policies.filter((_, i) => i !== index);
+    onSave(updated);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h3 className="font-bold text-sm">Data-flow Policies</h3>
+        <p className="text-xs text-muted-foreground mt-1">
+          Enforce compile-time restrictions on where specific variables or secrets can be sent.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        {policies.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic">
+            No policies active. By default, all data can flow to any allowed host.
+          </p>
+        ) : (
+          policies.map((policy, idx) => (
+            <div
+              key={idx}
+              className="flex items-center justify-between border border-border p-3 text-sm font-mono bg-muted/30"
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-1">
+                  <span className="text-hook font-bold">{policy.source}</span>
+                  <span className="text-muted-foreground text-xs">
+                    flows only to:
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {policy.allowedHosts.length === 0 ? (
+                    <Badge
+                      variant="destructive"
+                      className="text-[10px] py-0 px-1 font-mono"
+                    >
+                      Strictly Confidential (Nowhere)
+                    </Badge>
+                  ) : (
+                    policy.allowedHosts.map((h) => (
+                      <Badge
+                        key={h}
+                        variant="outline"
+                        className="text-[10px] py-0 px-1 font-mono"
+                      >
+                        {h}
+                      </Badge>
+                    ))
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => removePolicy(idx)}
+                className="text-xs text-destructive hover:underline"
+              >
+                Remove
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="border border-border p-3 bg-muted/10 space-y-3">
+        <h4 className="text-xs font-bold font-mono">Add Policy Rule</h4>
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="text"
+            placeholder="e.g. payload.email"
+            value={newSource}
+            onChange={(e) => setNewSource(e.target.value)}
+            className="border border-border bg-background px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-hook"
+          />
+          <input
+            type="text"
+            placeholder="Hosts (comma-separated)"
+            value={newHostsRaw}
+            onChange={(e) => setNewHostsRaw(e.target.value)}
+            className="border border-border bg-background px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-hook"
+          />
+        </div>
+        <Button
+          onClick={addPolicy}
+          size="sm"
+          className="w-full font-mono text-xs"
+        >
+          Enforce Policy
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 const SecretsManager = ({
   routeId,
   secrets,
@@ -426,7 +542,7 @@ const EventLog = ({
   </div>
 );
 
-type RightTab = "diagram" | "settings" | "events";
+type RightTab = "diagram" | "settings" | "policies" | "events";
 
 const TabButton = ({
   active,
@@ -595,6 +711,12 @@ const RouteDetailPage = () => {
               Settings
             </TabButton>
             <TabButton
+              active={rightTab === "policies"}
+              onClick={() => setRightTab("policies")}
+            >
+              Policies
+            </TabButton>
+            <TabButton
               active={rightTab === "events"}
               onClick={() => setRightTab("events")}
             >
@@ -640,6 +762,17 @@ const RouteDetailPage = () => {
                     name: string;
                     value: string;
                   }>}
+                />
+              </div>
+            )}
+            {rightTab === "policies" && (
+              <div className="p-4">
+                <PoliciesEditor
+                  policies={(route.policies ?? []) as Array<{
+                    source: string;
+                    allowedHosts: string[];
+                  }>}
+                  onSave={(policies) => updateRoute({ policies })}
                 />
               </div>
             )}
