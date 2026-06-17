@@ -32,19 +32,14 @@ Captain Hook supports scheduled triggers that execute your safescripts on a recu
 
 ## 3. API-driven Scheduled Runs
 
-Captain Hook supports a highly efficient, serverless, and robust API to schedule a script's run at a precise timestamp point in the future.
+Captain Hook supports a highly efficient, serverless, and robust API to schedule a script's run at a precise timestamp point in the future powered natively by **Upstash QStash**.
 
-### QStash Power (Production)
-If an `QSTASH_TOKEN` environment variable is configured, Captain Hook integrates natively with **Upstash QStash**—a serverless message queue. When you schedule a run:
+### How it Works
+When you schedule a run:
 1. The server registers the delayed message directly in Upstash QStash using the exact epoch timestamp.
 2. At the scheduled time, Upstash forwards the payload as an HTTP POST back to our execution endpoint.
-3. Upstash handles retries, queue persistence, and high-precision execution with zero idle costs.
-
-### Local Fallback (Development/Self-hosted)
-If `QSTASH_TOKEN` is not configured, Captain Hook automatically falls back to an elegant local background queue:
-1. Scheduled runs are saved to InstantDB with a `"pending"` status.
-2. A high-efficiency minutely background worker runs inside Deno Deploy.
-3. Every minute, the background worker fetches all pending runs where `timestamp <= Date.now()`, executes their scripts, and saves the final result.
+3. Upstash handles retries, queue persistence, and high-precision execution with zero idle costs on our Deno Deploy server.
+4. If the server does not have the `QSTASH_TOKEN` environment variable set, scheduling requests will immediately fail with a `500 Configuration Error` explaining that the token is required.
 
 ### Scheduling API (`POST /w/:routeId/schedule`)
 Schedule a route execution by making an HTTP POST request to your route's schedule URL.

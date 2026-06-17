@@ -1,5 +1,5 @@
 import { handleSchedule, handleWebhook } from "./handler.ts";
-import { handleTick } from "./cron.ts";
+import { handleCronTick } from "./cron.ts";
 import {
   handleGetRoute,
   handleSaveScript,
@@ -169,6 +169,6 @@ const handleRequest = async (request: Request): Promise<Response> => {
 
 const port = parseInt(Deno.env.get("PORT") ?? "8000");
 
-Deno.cron("minutely-tick", "* * * * *", handleTick);
+Deno.cron("hourly-tick", "0 * * * *", handleCronTick);
 
 Deno.serve({ port }, handleRequest);

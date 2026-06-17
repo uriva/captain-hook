@@ -299,52 +299,58 @@ export const handleSchedule = async (
 
   // If QSTASH_TOKEN is configured, use QStash!
   const qstashToken = Deno.env.get("QSTASH_TOKEN");
+  if (!qstashToken) {
+    console.error(
+      `[schedule] QSTASH_TOKEN is missing. Scheduled runs require Upstash QStash.`,
+    );
+    return new Response(
+      JSON.stringify({
+        error:
+          "Configuration Error: QSTASH_TOKEN is not configured on the server. Scheduled runs require Upstash QStash.",
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
   let qstashMessageId: string | null = null;
+  const origin = new URL(request.url).origin;
+  const targetUrl = `${origin}/w/${routeId}`;
 
-  if (qstashToken) {
-    const origin = new URL(request.url).origin;
-    const targetUrl = `${origin}/w/${routeId}`;
-
-    try {
-      console.log(
-        `[schedule] Scheduling via QStash for URL: ${targetUrl} at timestamp: ${parsedTimestamp}`,
-      );
-      const qstashRes = await fetch(
-        `https://qstash.upstash.io/v2/publish/${targetUrl}`,
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${qstashToken}`,
-            "Content-Type": "application/json",
-            "Upstash-Not-Before": String(Math.floor(parsedTimestamp / 1000)),
-          },
-          body: JSON.stringify(payload ?? {}),
+  try {
+    console.log(
+      `[schedule] Scheduling via QStash for URL: ${targetUrl} at timestamp: ${parsedTimestamp}`,
+    );
+    const qstashRes = await fetch(
+      `https://qstash.upstash.io/v2/publish/${targetUrl}`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${qstashToken}`,
+          "Content-Type": "application/json",
+          "Upstash-Not-Before": String(Math.floor(parsedTimestamp / 1000)),
         },
-      );
+        body: JSON.stringify(payload ?? {}),
+      },
+    );
 
-      if (!qstashRes.ok) {
-        const errText = await qstashRes.text();
-        throw new Error(
-          `QStash response error (${qstashRes.status}): ${errText}`,
-        );
-      }
-
-      const qstashData = await qstashRes.json();
-      qstashMessageId = qstashData.messageId;
-      console.log(
-        `[schedule] Successfully scheduled in QStash. MessageId: ${qstashMessageId}`,
-      );
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error(`[schedule] QStash scheduling failed:`, msg);
-      return new Response(
-        JSON.stringify({ error: `Failed to schedule with QStash: ${msg}` }),
-        { status: 500, headers: { "Content-Type": "application/json" } },
+    if (!qstashRes.ok) {
+      const errText = await qstashRes.text();
+      throw new Error(
+        `QStash response error (${qstashRes.status}): ${errText}`,
       );
     }
-  } else {
+
+    const qstashData = await qstashRes.json();
+    qstashMessageId = qstashData.messageId;
     console.log(
-      `[schedule] No QSTASH_TOKEN env var configured. Falling back to local minutely-cron polling.`,
+      `[schedule] Successfully scheduled in QStash. MessageId: ${qstashMessageId}`,
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`[schedule] QStash scheduling failed:`, msg);
+    return new Response(
+      JSON.stringify({ error: `Failed to schedule with QStash: ${msg}` }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
     );
   }
 
@@ -356,7 +362,7 @@ export const handleSchedule = async (
       (db.tx as any).scheduledRuns[id].update({
         timestamp: parsedTimestamp,
         payload: payload ? JSON.stringify(payload) : null,
-        status: qstashToken ? "scheduled" : "pending",
+        status: "scheduled",
         qstashMessageId,
       }),
       // deno-lint-ignore no-explicit-any
@@ -369,7 +375,7 @@ export const handleSchedule = async (
         id,
         routeId,
         timestamp: parsedTimestamp,
-        status: qstashToken ? "scheduled" : "pending",
+        status: "scheduled",
         qstashMessageId,
       }),
       { status: 201, headers: { "Content-Type": "application/json" } },
