@@ -118,7 +118,21 @@ Server (`captain-hook-server`):
 - `QSTASH_URL` — QStash base URL (regional endpoint). Note: `handler.ts`
   currently hardcodes the global `https://qstash.upstash.io` for publishing.
 - `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY` — QStash signing keys
-  for verifying inbound callbacks. Present but not yet used for verification.
+  used by `qstash.ts` to verify inbound callback signatures on `POST /w/:routeId`.
+
+### QStash callback verification
+
+`server/src/qstash.ts` exports `verifyQstashSignature`, called from
+`main.ts` before executing a webhook. Uses `@upstash/qstash`'s `Receiver`.
+Behavior:
+
+- No `Upstash-Signature` header → passes through (the endpoint is also a public
+  webhook receiver, so unsigned requests are allowed).
+- Signature present + valid → executes.
+- Signature present + invalid, or signing keys unconfigured → `401`.
+
+Verification requires the raw request body string (do not re-stringify parsed
+JSON), so the webhook path reads `request.text()` first, verifies, then parses.
 
 Site uses `.npmrc` with `ignore-scripts=true` to avoid msw postinstall failures.
 `shadcn` must be in devDependencies.

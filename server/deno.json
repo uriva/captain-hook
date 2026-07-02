@@ -5,6 +5,7 @@
     "test": "deno test --allow-all"
   },
   "imports": {
+    "@upstash/qstash": "npm:@upstash/qstash@^2.11.1",
     "@uri/safescript": "jsr:@uri/safescript@^0.1.0",
     "gamla": "jsr:@uri/gamla@0.0.14",
     "@instantdb/admin": "npm:@instantdb/admin@0.17.12"

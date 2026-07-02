@@ -1,5 +1,6 @@
 import { handleSchedule, handleWebhook } from "./handler.ts";
 import { handleCronTick } from "./cron.ts";
+import { verifyQstashSignature } from "./qstash.ts";
 import {
   handleGetRoute,
   handleSaveScript,
@@ -14,8 +15,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-const parseJsonBody = async (request: Request): Promise<unknown> => {
-  const text = await request.text();
+const parseBodyText = (text: string): unknown => {
   if (!text) return {};
   try {
     return JSON.parse(text);
@@ -23,6 +23,9 @@ const parseJsonBody = async (request: Request): Promise<unknown> => {
     return { raw: text };
   }
 };
+
+const parseJsonBody = (request: Request): Promise<unknown> =>
+  request.text().then(parseBodyText);
 
 const extractHeaders = (request: Request): Record<string, string> => {
   const result: Record<string, string> = {};
@@ -148,8 +151,22 @@ const handleRequest = async (request: Request): Promise<Response> => {
 
   if (match && request.method === "POST") {
     const routeId = match[1];
-    const body = await parseJsonBody(request);
+    const rawBody = await request.text();
     const headers = extractHeaders(request);
+    const verification = await verifyQstashSignature(
+      headers["upstash-signature"],
+      rawBody,
+      request.url,
+    );
+    if (!verification.ok) {
+      return withCorsHeaders(
+        new Response(JSON.stringify({ error: verification.error }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+    }
+    const body = parseBodyText(rawBody);
     const response = await handleWebhook(routeId, body, headers);
     return withCorsHeaders(response);
   }
