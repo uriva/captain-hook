@@ -95,12 +95,30 @@ Push permissions with: `npx instant-cli push perms --yes` from `site/`.
 
 ## Deno Deploy
 
-Both apps deploy via `deno deploy --prod` from their respective directories.
+Both apps auto-deploy from GitHub: pushing to the connected branch triggers a
+build/deploy via the Deno Deploy dashboard's GitHub integration. No GitHub
+Actions workflow is used. Manual deploys are still possible via
+`deno deploy --prod` from the respective directory.
 
 Server org: `uriva`, app: `captain-hook-server`. Site org: `uriva`, app:
 `captain-hook`.
 
 URL format: `https://{app}.{org}.deno.net`
+
+### Environment variables
+
+Set on Deno Deploy per app (manage via `deno deploy env` or the dashboard).
+Local dev reads them from a git-ignored `.env` in each directory.
+
+Server (`captain-hook-server`):
+
+- `INSTANT_APP_ID`, `INSTANT_ADMIN_TOKEN` — InstantDB admin client.
+- `QSTASH_TOKEN` — Upstash QStash publish token (the QStash-specific token, not
+  the Upstash account/developer token). Required for scheduled/deferred runs.
+- `QSTASH_URL` — QStash base URL (regional endpoint). Note: `handler.ts`
+  currently hardcodes the global `https://qstash.upstash.io` for publishing.
+- `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY` — QStash signing keys
+  for verifying inbound callbacks. Present but not yet used for verification.
 
 Site uses `.npmrc` with `ignore-scripts=true` to avoid msw postinstall failures.
 `shadcn` must be in devDependencies.
