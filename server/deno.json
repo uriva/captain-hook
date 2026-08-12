@@ -8,7 +8,7 @@
     "@upstash/qstash": "npm:@upstash/qstash@^2.11.1",
     "@uri/safescript": "jsr:@uri/safescript@^0.1.0",
     "gamla": "jsr:@uri/gamla@0.0.14",
-    "@instantdb/admin": "npm:@instantdb/admin@0.17.12"
+    "@instantdb/admin": "npm:@instantdb/admin@1.0.65"
   },
   "compilerOptions": {
     "strict": true
@@ -21,11 +21,14 @@
   },
   "lint": {
     "rules": {
-      "exclude": ["no-explicit-any"]
+      "exclude": [
+        "no-explicit-any"
+      ]
     }
   },
   "deploy": {
     "org": "uriva",
     "app": "captain-hook-server"
-  }
+  },
+  "minimumDependencyAge": 0
 }
