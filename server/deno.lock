@@ -5,7 +5,7 @@
     "jsr:@std/encoding@0.224.0": "0.224.0",
     "jsr:@uri/gamla@0.0.14": "0.0.14",
     "jsr:@uri/safescript@0.1": "0.1.0",
-    "npm:@instantdb/admin@0.17.12": "0.17.12",
+    "npm:@instantdb/admin@1.0.65": "1.0.65",
     "npm:@upstash/qstash@^2.11.1": "2.11.1",
     "npm:zod@^3.25.42": "3.25.76"
   },
@@ -31,17 +31,38 @@
     }
   },
   "npm": {
-    "@instantdb/admin@0.17.12": {
-      "integrity": "sha512-BAxfTJo+uP4Gp+qA4jNs8RcQ1s4ya/g6HJHonSsEExoMjgb4M7QnXblfbkXpZ9QSscuiFKVlmhtgwv3MCadK/Q==",
+    "@instantdb/admin@1.0.65": {
+      "integrity": "sha512-g/A6JgkLhHoRswx2uU7oCk2iJ93+DxBw84867IIdckYv2UTngQ65gNiJhbdWbZ4S5cD1+NMWCPXZBbQilVNHGw==",
       "dependencies": [
-        "@instantdb/core"
+        "@instantdb/core",
+        "@instantdb/eventsource",
+        "@instantdb/version",
+        "@instantdb/webhooks",
+        "cookie",
+        "uuid"
       ]
     },
-    "@instantdb/core@0.17.12": {
-      "integrity": "sha512-YBcuTn+OoFIcnFam3HwsKffk1kvpLRSbdGMasrersRDpaG4dDr8N0a6jeVYRUhjSL734zm/hVkv/yG0pevVT3A==",
+    "@instantdb/core@1.0.65": {
+      "integrity": "sha512-ZVxrKJOPcUcRYN9KrI+W+kVhzr7uKLZVZLRRqCdVvWSKkSGx8rg/obQa2E3MYnYpV+xPcphKjlZIC7pmwSDtSQ==",
       "dependencies": [
+        "@instantdb/version",
         "mutative",
         "uuid"
+      ]
+    },
+    "@instantdb/eventsource@4.1.0-2": {
+      "integrity": "sha512-k2uzhsRzdD7hzV3fv+eoCRNeluZcj4pDfUKKAhvIS6xshc7zHkaM9/m3vxBgaYoNVmvOyaGp84TcHG0/Bp7k4g==",
+      "dependencies": [
+        "eventsource-parser"
+      ]
+    },
+    "@instantdb/version@1.0.65": {
+      "integrity": "sha512-9uZa9zHM9lGKm7YD9ttaaYjA3dVPcuzTpq9aQBWH1PRyIU8G7aaOBLIpEDrtpnO+dng0iKi6S2WrPrynALfKQg=="
+    },
+    "@instantdb/webhooks@1.0.65": {
+      "integrity": "sha512-cO/JTXgd6NNAxeRmo0LkaAxHNjBEKBbPe8lPBbGhYu4OHq2izIqsAhsKaDHhpYjEEhYR/BiCgsHzD0BA3ecadA==",
+      "dependencies": [
+        "@instantdb/core"
       ]
     },
     "@upstash/qstash@2.11.1": {
@@ -52,8 +73,14 @@
         "neverthrow"
       ]
     },
+    "cookie@1.1.1": {
+      "integrity": "sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ=="
+    },
     "crypto-js@4.2.0": {
       "integrity": "sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q=="
+    },
+    "eventsource-parser@3.1.1": {
+      "integrity": "sha512-EKN1vKAMcZ8MlYMpaNuxN6R9yakzH6uajHcHVTqWJzvu5pWw9DyhbP35HH8MVBQ+dZjAfDxk+A8NiR9KWaXiyQ=="
     },
     "jose@5.10.0": {
       "integrity": "sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg=="
@@ -64,9 +91,8 @@
     "neverthrow@7.2.0": {
       "integrity": "sha512-iGBUfFB7yPczHHtA8dksKTJ9E8TESNTAx1UQWW6TzMF280vo9jdPYpLUXrMN1BCkPdHFdNG3fxOt2CUad8KhAw=="
     },
-    "uuid@9.0.1": {
-      "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
-      "deprecated": true,
+    "uuid@11.1.1": {
+      "integrity": "sha512-vIYxrBCC/N/K+Js3qSN88go7kIfNPssr/hHCesKCQNAjmgvYS2oqr69kIufEG+O4+PfezOH4EbIeHCfFov8ZgQ==",
       "bin": true
     },
     "zod@3.25.76": {
@@ -77,7 +103,7 @@
     "dependencies": [
       "jsr:@uri/gamla@0.0.14",
       "jsr:@uri/safescript@0.1",
-      "npm:@instantdb/admin@0.17.12",
+      "npm:@instantdb/admin@1.0.65",
       "npm:@upstash/qstash@^2.11.1"
     ]
   }
